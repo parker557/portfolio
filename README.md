@@ -1,17 +1,16 @@
 # Zheng Jiang Portfolio
 
-This repository collects selected projects in AI/VLM applications, full-stack software engineering, cybersecurity, databases, systems programming, and data analysis.
+Selected AI and software projects from my coursework, startup work, and personal builds.
 
-Start here:
+Most visitors should start with [Projects/README.md](./Projects/README.md). It gives a short index of the work I would discuss in an interview, plus notes on what is runnable, what is coursework, and what needs local configuration.
 
-- [Projects overview](./Projects/README.md)
+## What Is Here
 
-Highlighted work includes:
+- GenAI and computer vision experiments, including Qwen3-VL paired-image detection.
+- Full-stack web apps built with Node.js, React, Firebase, Flask, and MySQL.
+- Security and systems coursework, including encrypted chat, C scheduling, Java projects, and database design.
+- A few prototype scripts that are useful as evidence of hands-on work, but not polished products.
 
-- Qwen3-VL batch paired-image detection and bounding-box extraction
-- Property management web app with AI-assisted responses
-- Secure E2EE chat application with MFA and TLS
-- React/Firebase real-estate commerce website
-- Academic database, Java, C, Python, and data-analysis projects
+## Notes
 
-API keys, local configuration files, dependencies, and generated build outputs are intentionally excluded from the repository.
+Secrets, local config files, dependency folders, generated build outputs, and large demo videos are not committed. Where a project needs an API key or private config, the README notes the expected local setup.
