@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Environment and local secrets
+.env
+.env.*
+**/.finance_config.json
+**/keys.json
+*.pem
+*.key
+
+# Build and IDE output
+out/
+build/
+dist/
+target/
+*.class
+.idea/
+.vscode/
+
+# Local package archives and caches
+*.tgz
+*.zip
+*.rar
+
+# Large media
+*.mp4
+*.mov
+*.avi
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data and private reports
+**/db-data/
+**/sessions/
+**/otp_qrcode/
+Projects/finance_advise/history/
+Projects/finance_advise/money/
+Projects/finance_advise/*.md
+**/db.yaml

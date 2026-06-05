@@ -1,0 +1,141 @@
+.navbar {
+    width: 100vw;
+    padding: 10px 0;
+    height: 50px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.button {
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.button:hover {
+    text-decoration: underline;
+    text-decoration-color: #11315A;
+    text-underline-offset: 0.9rem;
+}
+
+.brandContainer {
+    margin-left: 100px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.brandContainer img {
+    width: 40px;
+    height: 40px;
+}
+
+.brandSet {
+    display: flex;
+    flex-direction: column;
+    padding-left: 10px;
+}
+
+.brand {
+    font-weight: 500;
+    font-size: large;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.slogan {
+    font-size: small;
+}
+
+.pagesContainer {
+    margin-right: 100px;
+    width: 450px;
+    height: 50px;
+    background-color: white;
+    display: flex;
+    padding: 0 20px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@media screen and (min-width: 1001px) {
+    .mobile {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    .desktop {
+        display: none;
+    }
+
+    .mobile {
+        display: flex;
+    }
+
+    .brandContainer {
+        margin-left: 5vw;
+    }
+
+    .slogan {
+        width: 130px;
+    }
+
+    .pagesContainer {
+        margin: 0 0;
+        position: absolute;
+        top: inherit;
+        right: 5vw;
+        width: 100px;
+        height: 200px;
+        background-color: white;
+        flex-direction: column;
+        border: 5px solid #11315A;
+        padding: 15px;
+        z-index: 2;
+    }
+}
+
+
+.hamburgerIcon {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    justify-content: space-around;
+    flex-flow: column nowrap;
+    z-index: 10;
+    margin-right: 5vw;
+    cursor: pointer;
+}
+
+.closeContainer {
+    display: none;
+}
+
+.bar {
+    width: 2rem;
+    height: 0.25rem;
+    border-radius: 10px;
+    background-color: black;
+    transform-origin: 1px;
+    transition: all 0.3s linear;
+}
+
+.burger1 {
+    transform: rotate(45deg);
+}
+
+.burger2 {
+    opacity: 0;
+}
+
+.burger3 {
+    transform: rotate(-45deg);
+}

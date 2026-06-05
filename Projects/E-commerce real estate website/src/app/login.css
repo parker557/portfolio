@@ -1,0 +1,39 @@
+#login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* height: 100vh; */
+    background-image: url('../image/Pricing.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+  .login-success {
+    color: red;
+  }
+  
+  .login-container {
+    width: 300px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff; /* 添加一个背景色，以便在背景图加载失败时提供备用 */
+  }
+  
+  .login-container h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .login-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .login-form .MuiTextField-root {
+    margin-bottom: 20px;
+  }
+  
+  .login-form .MuiButton-root {
+    margin-top: 20px;
+  }

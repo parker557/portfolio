@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9fb;
+            color: #333;
+        }
+        header {
+            background-color: #35495e;
+            color: #fff;
+            text-align: center;
+            padding: 1.5em 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        main {
+            padding: 2em;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .module {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .module:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        h2 {
+            margin-top: 0;
+            color: #35495e;
+            font-size: 20px;
+            border-bottom: 2px solid #35495e;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #e0e0e0;
+        }
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            color: #555;
+        }
+        tbody tr:nth-child(odd) {
+            background-color: #f9f9fb;
+        }
+        tbody tr:hover {
+            background-color: #f1f1f7;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #35495e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2a3d4f;
+        }
+        .chat-box {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fdfdfd;
+            border-radius: 8px;
+        }
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .chat-message.owner {
+            text-align: left;
+            background-color: #e3f7e3;
+            color: #2d7a2d;
+        }
+        .chat-message.staff {
+            text-align: left;
+            background-color: #e3eaf7;
+            color: #2d5d7a;
+        }
+        .chat-message.self {
+            text-align: right;
+            background-color: #f7eff2;
+            color: #bb4c71;
+        }
+        .chat-message.ai {
+            text-align: left;
+            background-color: #2cfa0c;
+            color: #bb4c71;
+        }
+        .chat-input {
+            width: calc(100% - 100px);
+            margin-right: 10px;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .chat-send-button {
+            padding: 10px 20px;
+        }
+
+    </style>
+    <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+    <script>
+        let username = '';
+        let role = '';
+
+        const socket = io();
+
+        // Receive chat history
+        socket.on('chat history', async (messages) => {
+            // alert(messages[1].sender);
+            await getUserName();
+            const chatBox = document.getElementById('chat-box');
+            let chatForm = '';
+            chatBox.innerHTML = ''; // Clear previous messages
+            messages.forEach(message => {
+                const msgDiv = document.createElement('div');
+                chatForm = message.sender === username ? 'self' : message.role;
+                msgDiv.className = `chat-message ${chatForm}`;
+                msgDiv.textContent = `[${message.time}] ${message.sender}: ${message.text}`;
+                // console.log(msgDiv.textContent);
+                chatBox.appendChild(msgDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        });
+
+        // Receive new messages
+        socket.on('receive message', (message) => {
+            const chatBox = document.getElementById('chat-box');
+            const msgDiv = document.createElement('div');
+            if (message.sender !== username) {
+                msgDiv.className = `chat-message ${message.role}`;
+                msgDiv.textContent = `[${message.time}] ${message.sender}: ${message.text}`;
+                chatBox.appendChild(msgDiv);
+                chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
+            }
+        });
+
+        // Send a message
+        function sendMessage(event) {
+            event.preventDefault();
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+
+            if (text !== '') {
+                const now = new Date();
+                const timestamp = now.toISOString().replace('T', ' ').substring(0, 19);
+
+                const message = {
+                    role: role,
+                    sender: username, // Dynamically set this based on the user
+                    text: text,
+                    time: timestamp,
+                };
+
+                // Append the message locally in chat
+                const chatBox = document.getElementById('chat-box');
+                const messageElement = document.createElement('div');
+                const chatForm = 'self';
+                messageElement.className = `chat-message ${chatForm}`; // Set correct class based on sender
+                messageElement.textContent = `[${message.time}] ${message.sender}: ${message.text}`;
+                chatBox.appendChild(messageElement);
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                // Emit the message to the server
+                socket.emit('send message', message);
+
+                // Clear input
+                input.value = '';
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage(event);
+            }
+        }
+
+        async function getUserName() {
+            const response = await fetch('/chat-user-data');
+            if (response.ok) {
+                const data = await response.json();
+                username = data.username;
+                role = data.role;
+                document.getElementById('username-placeholder').textContent = username;
+                // alert(username + role);  // Use the data as needed
+            } else {
+                alert('Failed to load user data');
+            }
+        }
+
+
+        async function fetchProperties() {
+            const response = await fetch('/owner/properties');
+            if (response.ok) {
+                const data = await response.json();
+                const propertiesList = document.getElementById('properties-list');
+                propertiesList.innerHTML = '';
+
+                data.properties.forEach(property => {
+                    const propertyElement = document.createElement('tr');
+                    propertyElement.innerHTML = `
+                        <td>${property.propertyID}</td>
+                        <td>${property.buildingNo}</td>
+                        <td>${property.roomNo}</td>
+                        <td>${property.squareMeter}</td>
+                        <td>${property.bedrooms}</td>
+                        <td>${property.isRented ? 'Yes' : 'No'}</td>
+                        <td>${property.rentalDate || 'N/A'}</td>
+                        <td>${property.isPurchased ? 'Yes' : 'No'}</td>
+                        <td>${property.purchaseDate || 'N/A'}</td>
+                    `;
+                    propertiesList.appendChild(propertyElement);
+                });
+
+                // Populate the dropdown
+                const propertyDropdown = document.getElementById('repair-property-id');
+                propertyDropdown.innerHTML = '<option value="">Select a Property</option>'; // Reset options
+                data.properties.forEach(property => {
+                    const option = document.createElement('option');
+                    option.value = property.propertyID;
+                    option.textContent = `${property.buildingNo}-${property.roomNo}`;
+                    propertyDropdown.appendChild(option);
+                });
+            } else {
+                alert('Failed to fetch property details.');
+            }
+        }
+
+        async function submitRepairRequest() {
+            const propertyDropdown = document.getElementById('repair-property-id');
+            const selectedOption = propertyDropdown.options[propertyDropdown.selectedIndex];
+            
+            const propertyID = selectedOption.value;
+            const [buildingNo, roomNo] = selectedOption.text.split('-');
+            const issue = document.getElementById('repair-issue').value;
+            
+            if (!propertyID || !issue.trim()) {
+                alert('Please select a property and describe the issue.');
+                return;
+            }
+
+            const response = await fetch('/owner/repair', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ propertyID, buildingNo: buildingNo.trim(), roomNo: roomNo.trim(), issue }),
+            });
+            const data = await response.json();
+            alert(data.message);
+        }
+
+        async function fetchNotices() {
+            const response = await fetch('/owner/notice');
+            if (response.ok) {
+                const data = await response.json();
+                const noticesList = document.getElementById('notice-list');
+                noticesList.innerHTML = '';
+
+                data.forEach(notice => {
+                    const noticeElement = document.createElement('tr');
+                    noticeElement.innerHTML = `
+                        <td>${notice.property}</td>
+                        <td>${notice.issue}</td>
+                        <td>${notice.date}</td>
+                        <td>${notice.time}</td>
+                    `;
+                    noticesList.appendChild(noticeElement);
+                });
+            } else {
+                alert('Failed to fetch repair details.');
+            }
+        }
+        
+        async function fetchPublicNotices() {
+            const response = await fetch('/owner/public-notice');
+            if (response.ok) {
+                const data = await response.json();
+                const noticesList = document.getElementById('public-notice-list');
+                noticesList.innerHTML = '';
+
+                data.forEach(notice => {
+                    const noticeElement = document.createElement('tr');
+                    noticeElement.innerHTML = `
+                        <td>${notice.issue}</td>
+                        <td>${notice.date}</td>
+                        <td>${notice.time}</td>
+                    `;
+                    noticesList.appendChild(noticeElement);
+                });
+            } else {
+                alert('Failed to fetch repair details.');
+            }
+        }
+
+
+        window.onload = () => {
+            getUserName();
+            fetchProperties();
+            fetchNotices();
+            fetchPublicNotices();
+        };
+
+        // window.onload = fetchProperties;
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Welcome, <span id="username-placeholder">User</span></h1>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Your Properties -->
+            <div class="module" style="grid-column: span 4;">
+                <h2 class="module-title">Your Properties</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Property ID</th>
+                            <th>Building No.</th>
+                            <th>Room No.</th>
+                            <th>Square Meter</th>
+                            <th>Bedrooms</th>
+                            <th>Rented</th>
+                            <th>Rental Date</th>
+                            <th>Purchased</th>
+                            <th>Purchase Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="properties-list">
+                        <tr><td colspan="9">Loading properties...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Public Notice and Payment Information -->
+            <div class="module" style="grid-column: span 2;">
+                <h2 class="module-title">Public Notice</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Notice</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="public-notice-list">
+                        <!-- <tr>
+                            <td>PN001</td>
+                            <td>2024-01-01</td>
+                            <td>Water supply will be cut off on Monday, January 5th for maintenance.</td>
+                        </tr>
+                        <tr>
+                            <td>PN002</td>
+                            <td>2024-02-01</td>
+                            <td>The parking lot will be under maintenance from February 10th to February 15th. No entry allowed during this period.</td>
+                        </tr> -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="module" style="grid-column: span 2;">
+                <h2 class="module-title">Payment Information</h2>
+                <table class="payment-table">
+                    <thead>
+                        <tr>
+                            <th>Payment ID</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>PMT001</td>
+                            <td>2024-01-10</td>
+                            <td>$500</td>
+                            <td>Yes</td>
+                        </tr>
+                        <tr>
+                            <td>PMT002</td>
+                            <td>2024-02-05</td>
+                            <td>$450</td>
+                            <td>No</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Personal Message and Request for Repair -->
+            <div class="module" style="grid-column: span 2;">
+                <h2 class="module-title">Personal Notice</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Property</th>
+                            <th>Notice</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notice-list">
+                        <!-- <tr>
+                            <td>PM001</td>
+                            <td>Staff</td>
+                            <td>2024-01-15</td>
+                            <td>Reminder: Rent payment is due by the end of this month.</td>
+                        </tr>
+                        <tr>
+                            <td>PM002</td>
+                            <td>Resident</td>
+                            <td>2024-02-05</td>
+                            <td>Please be considerate when parking. Keep the driveway clear.</td>
+                        </tr> -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="module" style="grid-column: span 2;">
+                <h2 class="module-title">Request for Repair</h2>
+                <label for="repair-property-id">Property ID:</label>
+                <select id="repair-property-id" required>
+                    <option value="">Select a Property</option>
+                </select>
+                <!-- <label for="repair-property-id">Property ID:</label>
+                <input type="text" id="repair-property-id" placeholder="Enter your property ID" required> -->
+                <br><br>
+                <label for="repair-issue">Describe the issue:</label>
+                <textarea id="repair-issue" rows="4" placeholder="Enter details of the issue" required></textarea>
+                <br><br>
+                <button onclick="submitRepairRequest()">Submit Request</button>
+            </div>
+
+            <!-- Chat with Property Management -->
+            <div class="module" style="grid-column: span 3;">
+                <h2 class="module-title">Chat with Property Management</h2>
+                <div class="chat-box" id="chat-box" style="height: 300px; overflow-y: auto;"></div>
+                <input type="text" id="chat-input" class="chat-input" placeholder="Type your message here..."
+                onkeypress="handleKeyPress(event)">
+                <button class="chat-send-button" onclick="sendMessage(event)">Send</button>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

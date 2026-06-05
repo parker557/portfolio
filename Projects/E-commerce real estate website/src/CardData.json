@@ -1,0 +1,37 @@
+[
+    {
+        "title": "User analysis system",
+        "content": "This function allows your trading platform to perform data analysis automatically, it helps your team identify customer preferences in order to adjust your marketing strategy or business direction.",
+        "img": "../image/Analysis.jpg"
+    },
+    
+    {
+        "title": "Pair rental system",
+        "content": "This function allows your trading platform to deliver a pairing system, it connects your customer with his/her potential housemates, ensuring a harmonious living experience. Thus, it can relieve your property's vacancy and make more deals!",
+        "img": "../image/PairRental.png"
+    },
+
+    {
+        "title": "Advanced searching system",
+        "content": "This upgrade enhances the original searching function, users are more likely to use your platform as it increases users' house-hunting experience by offering diverse and accurate searching criteria, such as job opportunities and facilities.",
+        "img": "../image/Searching.jpg"
+    },
+
+    {
+        "title": "Recommendation algorithm",
+        "content": "This feature automatically feeds suitable houses for the user based on their preferences and reviews from the community. It increases the turnover by promoting some houses that align with users' expectations.",
+        "img": "../image/Recommendation.jpg"
+    },
+
+    {
+        "title": "Dynamic pricing system",
+        "content": "This system provides a more reliable and competitive rental price for your property by fetching the price data from the global market or local market automatically, which dramatically reduces the workload on market research and monitoring.",
+        "img": "../image/Pricing.jpg"
+    },
+
+    {
+        "title": "AI customer support",
+        "content": "This feature equips your platform with a real-time AI assistant, mainly focused on customer service. By providing 24/7 customer support, users have a deep understanding and satisfaction with your platform, which increases customer retention.",
+        "img": "../image/AISupport.jpg"
+    }
+]

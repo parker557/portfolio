@@ -1,0 +1,132 @@
+span {
+    color: gold;
+}
+
+#introduction {
+    width: auto;
+    height: 300px;
+    padding: 50px 150px;
+    color: white;
+    background-color: #11315A;
+}
+
+#introInfoContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#introInfoContainer .textbox {
+    width: 600px;
+    margin: 0 20px;
+}
+
+#introInfoContainer p {
+    font-size: small;
+}
+
+#introInfoContainer h1 {
+    font-size: xx-large;
+}
+
+#introInfoContainer img {
+    width: 300px;
+    height: 480px;
+}
+
+#features {
+    width: auto;
+    height: 600px;
+    padding: 50px 150px;
+    background-color: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+#basicContainer {
+    padding: 5vh;
+    width: 350px;
+    height: 400px;
+    background-color: #D0ECEB;
+}
+
+#basicContainer h1 {
+    margin: 0;
+}
+
+#basicContainer h3 {
+    margin-top: 50px;
+}
+
+#extraContainer {
+    padding: 5vh;
+    margin-top: 100px;
+    width: 350px;
+    height: 400px;
+    background-color: #F9EEE0;
+}
+
+#extraContainer h1 {
+    margin: 0;
+}
+
+#extraContainer h3 {
+    margin-top: 30px;
+}
+
+.fullstop {
+    margin: 0;
+    font-size: large;
+}
+
+#advantages {
+    width: auto;
+    height: 400px;
+    background-color: #28D8FF;
+}
+
+#advantages h1 {
+    color: white;
+    padding-top: 5vh;
+    padding-left: 150px;
+    font-size: xx-large;
+}
+
+.boxSet {
+    padding: 50px 150px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.box {
+    background-color: white;
+    border: 5px solid #11315A;
+    width: 25vw;
+    border-radius: 25px;
+    margin: 1vh 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#QA {
+    width: auto;
+    height: 600px;
+    padding: 0 150px;
+}
+
+#QA h1 {
+    padding: 30px;
+    text-align: center;
+    font-size: xx-large;
+}
+
+.AccordionList {
+    margin-top: 5vh;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+}

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9fb;
+            color: #333;
+        }
+        header {
+            background-color: #35495e;
+            color: #fff;
+            text-align: center;
+            padding: 1.5em 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        main {
+            padding: 2em;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .module {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .module:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        h2 {
+            margin-top: 0;
+            color: #35495e;
+            font-size: 20px;
+            border-bottom: 2px solid #35495e;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #e0e0e0;
+        }
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            color: #555;
+        }
+        tbody tr:nth-child(odd) {
+            background-color: #f9f9fb;
+        }
+        tbody tr:hover {
+            background-color: #f1f1f7;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #35495e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2a3d4f;
+        }
+        .chat-box {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fdfdfd;
+            border-radius: 8px;
+        }
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .chat-message.owner {
+            text-align: left;
+            background-color: #e3f7e3;
+            color: #2d7a2d;
+        }
+        .chat-message.staff {
+            text-align: left;
+            background-color: #e3eaf7;
+            color: #2d5d7a;
+        }
+        .chat-message.self {
+            text-align: right;
+            background-color: #f7eff2;
+            color: #bb4c71;
+        }
+        .chat-message.ai {
+            text-align: right;
+            background-color: #2cfa0c;
+            color: #bb4c71;
+        }
+        .chat-input {
+            width: calc(100% - 100px);
+            margin-right: 10px;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .chat-send-button {
+            padding: 10px 20px;
+        }
+
+    </style>
+    <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+    <script>
+        let username = '';
+        let role = '';
+
+        const socket = io();
+
+        // async function setupSocket() {
+        //     await getUserName();
+        // }
+
+        // Receive chat history
+        socket.on('chat history', async (messages) => {
+            // alert(messages[1].sender);
+            await getUserName();
+            const chatBox = document.getElementById('chat-box1');
+            let chatForm = '';
+            chatBox.innerHTML = ''; // Clear previous messages
+            // alert(username)
+            messages.forEach(message => {
+                const msgDiv = document.createElement('div');
+                // alert(message.sender);
+                chatForm = message.sender === username ? 'self' : message.role;
+                msgDiv.className = `chat-message ${chatForm}`;
+                msgDiv.textContent = `[${message.time}] ${message.sender}: ${message.text}`;
+                // alert(msgDiv.textContent)
+                chatBox.appendChild(msgDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+
+        });
+
+        // Receive new messages
+        socket.on('receive message', async (message) => {
+            const chatBox = document.getElementById('chat-box1');
+            const msgDiv = document.createElement('div');
+            const aiModeToggle = document.getElementById('aiModeToggle');
+            const isAIModeEnabled = aiModeToggle.checked;
+            if (message.sender !== username) {
+                msgDiv.className = `chat-message ${message.role}`;
+                msgDiv.textContent = `[${message.time}] ${message.sender}: ${message.text}`;
+                chatBox.appendChild(msgDiv);
+                chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
+            }
+            if (isAIModeEnabled && message.role === 'owner') {
+                try {
+                    const response = await fetch('/deepseek-response', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ role: message.role, text: message.text }),
+                    });
+
+                    const data = await response.json();
+                    if (data && data.response) {  
+                        const now = new Date();
+                        const timestamp = now.toISOString().replace('T', ' ').substring(0, 19);
+                        const message = {
+                            role: "ai",
+                            sender: "AI",
+                            text: data.response,
+                            time: timestamp,
+                        };
+                        socket.emit('send message', message);
+                    } else {
+                        console.error("No response from DeepSeek:", data);
+                    }
+                } catch (error) {
+                    console.error("Error fetching DeepSeek response:", error);
+                }
+
+                
+            }
+                // const gptResponseDiv = document.createElement('div');
+                // gptResponseDiv.className = 'chat-message staff';  // Use 'staff' for the AI response
+                // const data = "12345";
+                // gptResponseDiv.textContent = `[${new Date().toLocaleTimeString()}] AI: ${data}`;
+                // chatBox.appendChild(gptResponseDiv);
+                // chatBox.scrollTop = chatBox.scrollHeight;
+            
+        });
+
+        // Send a message
+        function sendMessage(event) {
+            event.preventDefault();
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+
+            if (text !== '') {
+                const now = new Date();
+                const timestamp = now.toISOString().replace('T', ' ').substring(0, 19);
+
+                const message = {
+                    role: role,
+                    sender: username, // Dynamically set this based on the user
+                    text: text,
+                    time: timestamp,
+                };
+
+                // Append the message locally in chat
+                const chatBox = document.getElementById('chat-box1');
+                const messageElement = document.createElement('div');
+                const chatForm = 'self';
+                messageElement.className = `chat-message ${chatForm}`; // Set correct class based on sender
+                messageElement.textContent = `[${message.time}] ${message.sender}: ${message.text}`;
+                chatBox.appendChild(messageElement);
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                // Emit the message to the server
+                socket.emit('send message', message);
+
+                // Clear input
+                input.value = '';
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage(event);
+            }
+        }
+
+        async function getUserName() {
+            const response = await fetch('/chat-user-data');
+            if (response.ok) {
+                const data = await response.json();
+                username = data.username;
+                role = data.role;
+                document.getElementById('username-placeholder').textContent = username;
+                // alert(username + role);  // Use the data as needed
+            } else {
+                alert('Failed to load user data');
+            }
+        }
+
+        async function fetchProperties() {
+            const response = await fetch('/staff/properties');
+            if (response.ok) {
+                const data = await response.json();
+
+                // Populate the dropdown
+                const propertyDropdown = document.getElementById('notice-property-id');
+                propertyDropdown.innerHTML = '<option value="">Select a Property</option>'; // Reset options
+                data.properties.forEach(property => {
+                    const option = document.createElement('option');
+                    option.value = property.ownerID;
+                    option.textContent = `${property.buildingNo}-${property.roomNo}`;
+                    propertyDropdown.appendChild(option);
+                });
+            } else {
+                alert('Failed to fetch property details.');
+            }
+        }
+        
+
+
+        async function fetchRepairs() {
+            const response = await fetch('/staff/repairs');
+            if (response.ok) {
+                const data = await response.json();
+                const repairsList = document.getElementById('repairs-list');
+                repairsList.innerHTML = '';
+
+                data.forEach(repair => {
+                    const repairElement = document.createElement('tr');
+                    repairElement.innerHTML = `
+                        <td>${repair.id}</td>
+                        <td>${repair.property}</td>
+                        <td>${repair.issue}</td>
+                        <td>${repair.status}</td>
+                        <td>${repair.date}</td>
+                        <td>${repair.time}</td>
+                        <td>${repair.maintainer}</td>
+                        <td><button onclick="updateRepairStatus(${repair.id})">Update</button></td>
+                    `;
+                    repairsList.appendChild(repairElement);
+                });
+            } else {
+                alert('Failed to fetch repair details.');
+            }
+        }
+
+        async function updateRepairStatus(id) {
+            const status = prompt('Enter the new status (e.g., Pending, In Progress, Completed):');
+            const response = await fetch('/staff/repair/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id, status }),
+            });
+            const data = await response.json();
+            alert(data.message);
+            fetchRepairs();
+        }
+
+        async function fetchPayments() {
+            const response = await fetch('/staff/payments');
+            if (response.ok) {
+                const data = await response.json();
+                const paymentsList = document.getElementById('payments-list');
+                paymentsList.innerHTML = '';
+
+                data.forEach(payment => {
+                    const paymentElement = document.createElement('tr');
+                    paymentElement.innerHTML = `
+                        <td>${payment.paymentID}</td>
+                        <td>${payment.date}</td>
+                        <td>${payment.amount}</td>
+                        <td>${payment.paid ? 'Paid' : 'Unpaid'}</td>
+                    `;
+                    paymentsList.appendChild(paymentElement);
+                });
+            } else {
+                alert('Failed to fetch payment details.');
+            }
+        }
+
+        async function submitNotice() {
+            const propertyDropdown = document.getElementById('notice-property-id');
+            const selectedOption = propertyDropdown.options[propertyDropdown.selectedIndex];
+            
+            let ownerID = -1;
+            let buildingNo = '';
+            let roomNo = '';
+
+            if (selectedOption && selectedOption.value !== "") {
+                ownerID = parseInt(selectedOption.value, 10);
+                [buildingNo, roomNo] = selectedOption.text.split('-');
+            }
+            
+            const issue = document.getElementById('notice-issue').value;
+            
+            // alert(ownerID+buildingNo+roomNo+issue);
+
+            if (!issue.trim()) {
+                alert('Please describe the notice issue.');
+                return;
+            }
+
+            const response = await fetch('/staff/notice', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ownerID, buildingNo: buildingNo.trim(), roomNo: roomNo.trim(), issue }),
+            });
+            const data = await response.json();
+            alert(data.message);
+        }
+
+        // async function fetchChatMessages() {
+        //     const response = await fetch('/staff/chat');
+        //     if (response.ok) {
+        //         const data = await response.json();
+        //         const chatBox = document.getElementById('chat-box');
+        //         chatBox.innerHTML = '';
+
+        //         data.forEach(msg => {
+        //             const messageElement = document.createElement('div');
+        //             messageElement.classList.add('message', msg.sender);
+        //             messageElement.innerText = `${msg.timestamp} - ${msg.sender}: ${msg.message}`;
+        //             chatBox.appendChild(messageElement);
+        //         });
+        //     } else {
+        //         alert('Failed to fetch chat messages.');
+        //     }
+        // }
+
+        // async function sendChatMessage() {
+        //     const messageInput = document.getElementById('chat-input');
+        //     const message = messageInput.value;
+        //     if (message.trim() === '') {
+        //         alert('Please enter a message.');
+        //         return;
+        //     }
+        //     const response = await fetch('/staff/chat', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify({ message }),
+        //     });
+        //     const data = await response.json();
+        //     alert(data.message);
+        //     messageInput.value = '';
+        //     fetchChatMessages();
+        // }
+
+        window.onload = () => {
+            // getUserName();
+            fetchRepairs();
+            fetchPayments();
+            fetchProperties();
+        };
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Staff Dashboard (<span id="username-placeholder">User</span>)</h1>
+    </header>
+
+    <main>
+        <div class="container">
+
+            <div>
+                <label>
+                    <input type="checkbox" id="aiModeToggle"> Enable AI Mode
+                </label>
+            </div>
+
+            <!-- Repair Requests Section -->
+            <!-- <div class="repair-section">
+                <h2>Repair Requests</h2> -->
+
+            <div class="module" style="grid-column: span 4;">
+                <h2 class="module-title">Repair Requests</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Request ID</th>
+                            <th>Property</th>
+                            <th>Issue</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Maintainer</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="repairs-list">
+                        <!-- Repairs will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="module" style="grid-column: span 2;">
+                <h2 class="module-title">Send Notice</h2>
+                <label for="notice-property-id">Property ID:</label>
+                <select id="notice-property-id" required>
+                    <option value="">Select a Property</option>
+                </select>
+                <br><br>
+                <label for="notice-issue">Describe the Notice:</label>
+                <textarea id="notice-issue" rows="4" placeholder="Enter details of the Notice" required></textarea>
+                <br><br>
+                <button onclick="submitNotice()">Submit Notice</button>
+            </div>
+
+            <!-- Payment Information Section -->
+            <div class="module" style="grid-column: span 2;">
+                <h2 class="module-title">Payment Information</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Payment ID</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payments-list">
+                        <!-- Payments will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Chat Module -->
+            <div class="module" style="grid-column: span 3;">
+                <h2 class="module-title">Chat with Owners</h2>
+                <div class="chat-box" id="chat-box1" style="height: 300px; overflow-y: auto;"></div>
+                <input type="text" id="chat-input" class="chat-input" placeholder="Type your message here..."
+                onkeypress="handleKeyPress(event)">
+                <button class="chat-send-button" onclick="sendMessage(event)">Send</button>
+            </div>
+
+
+        </div>
+    </main>
+</body>
+</html>

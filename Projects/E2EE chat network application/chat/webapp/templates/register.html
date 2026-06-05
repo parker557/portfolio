@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+     <!-- Bootstrap CSS -->
+    <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
+
+     <!-- External CSS -->
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="register-container" {% if otp_code or recovery_key %}style="pointer-events: none; opacity: 0.5;"{% endif %}>
+         {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <h2  class="text-center">Register</h2>
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        <form action="/register" method="post">
+            <div class="form-group">
+                <input type="text" class="form-control" name="username" placeholder="Username (4 - 20 units)" minlength="4" maxlength="20" required>
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" id="password" name="password" placeholder="Password (8 - 40 units) " minlength="8" maxlength="40"  required>
+                <span id="psw_level"></span>
+            </div>
+
+            <script>
+                function checkPassword(password) {
+                    const sha1 = crypto.subtle.digest('SHA-1', new TextEncoder().encode(password))
+                    .then(hashBuffer => {
+                        const hashArray = Array.from(new Uint8Array(hashBuffer));
+                        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                        return hashHex;
+                    });
+
+                    sha1.then(hashHex => {
+                        const prefix = hashHex.substring(0, 5);
+                        const suffix = hashHex.substring(5).toUpperCase();
+
+                        fetch(`https://api.pwnedpasswords.com/range/${prefix}`)
+                        .then(response => response.text())
+                        .then(hashes => {
+                            const hashSuffixes = hashes.split('\n'); // Changed to '\n' for splitting
+                            console.log(hashSuffixes); // Debugging line
+                            const breached = hashSuffixes.some(line => line.startsWith(suffix));
+                            console.log(breached); // Debugging line
+                            const pswLevelElement = document.getElementById('psw_level');
+                            if (password == '') {
+                                pswLevelElement.textContent = '';
+                            } else if (breached) {
+                                pswLevelElement.textContent = 'not safe';
+                                pswLevelElement.style.color = 'red';
+                            } else {
+                                pswLevelElement.textContent = 'safe';
+                                pswLevelElement.style.color = 'green';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching HIBP API:', error);
+                            document.getElementById('psw_level').textContent = 'error checking password';
+                        });
+                    });
+                }
+
+                document.getElementById('password').addEventListener('input', function() {
+                    checkPassword(this.value);
+                });
+            </script>
+
+
+            <div class="form-group">
+                <input type="password" class="form-control" id="con_password" name="con_password" placeholder="Confirm Password" minlength="8" maxlength="40" required>
+            </div>
+
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Register</button>
+                 <a href="/login" class="btn btn-secondary">Cancel</a>
+            </div>
+
+
+
+        </form>
+        {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+    </div>
+
+    {% if otp_code %}
+    <div class="overlay" id="otpModal" tabindex="-1" >
+        <div class="modal-dialog modal-dialog-centered" id="otpInbox" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="otpModalLabel">Google Authenticator Code</h5>
+                </div>
+                <div class="modal-body">
+                    <img src="{{ url_for('serve_qr_code') }}" alt="QR Code" class="img-fluid">
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary" href="/login">Next</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if recovery_key %}
+    <div class="overlay" id="recovery_key_Modal" tabindex="-1" >
+        <div class="modal-dialog modal-dialog-centered" id="recovery_key_Inbox" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="recovery_key_ModalLabel">Recovery Key</h5>
+                </div>
+                <div class="modal-body" id="recovery_key" data-recovery-key="{{recovery_key}}">
+                    <!-- The recovery key will be formatted and displayed here -->
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary" href="/login">Finish</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function formatRecoveryKey(key) {
+            // Split the key into parts and wrap hyphens with a div to prevent selection
+            return key.match(/.{1,6}/g).join('<span class="no-select">-</span>');
+        }
+
+        window.onload = function() {
+            var recoveryKeyElement = document.getElementById('recovery_key');
+            if (recoveryKeyElement) {
+                var key = recoveryKeyElement.getAttribute('data-recovery-key');
+                // Set the innerHTML to include divs around hyphens
+                recoveryKeyElement.innerHTML = formatRecoveryKey(key);
+            }
+        };
+    </script>
+    {% endif %}
+
+</body>
+</html>

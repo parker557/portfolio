@@ -1,0 +1,4 @@
+vardef vardef1 int x 7
+binexpr exp1 x % 4
+assign assign1 x exp1
+program program1 vardef1 exp1 assign1

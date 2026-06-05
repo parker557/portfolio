@@ -1,0 +1,36 @@
+algorithm:FCFS the time of output 0 
+***Rejected List*** 
+Altogether there are 1 appointments rejected.
+========================================================================= 
+1. projectMeeting john 20230402 1900 2.0  paul  mary 
+                    - End of Rejected List -  
+========================================================================= 
+ 
+ 
+algorithm:PRIORITY the time of output 1 
+***Rejected List*** 
+Altogether there are 1 appointments rejected.
+========================================================================= 
+1. projectMeeting john 20230402 1900 2.0  paul  mary 
+                    - End of Rejected List -  
+========================================================================= 
+ 
+ 
+algorithm:FCFS(print ALL) the time of output 1 
+***Rejected List*** 
+Altogether there are 1 appointments rejected.
+========================================================================= 
+1. projectMeeting john 20230402 1900 2.0  paul  mary 
+                    - End of Rejected List -  
+========================================================================= 
+ 
+ 
+algorithm:PRIORITY(print ALL) the time of output 1 
+***Rejected List*** 
+Altogether there are 1 appointments rejected.
+========================================================================= 
+1. projectMeeting john 20230402 1900 2.0  paul  mary 
+                    - End of Rejected List -  
+========================================================================= 
+ 
+ 

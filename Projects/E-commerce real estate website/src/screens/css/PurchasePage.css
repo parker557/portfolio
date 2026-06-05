@@ -1,0 +1,50 @@
+#container {
+    width: 1000px;
+    margin: 0 8vw;
+}
+
+ .textbox {
+    width: 600px;
+    margin: 20px;
+}
+
+.pricing-table {
+    display: flex;
+    justify-content: space-around;
+    margin: 0 auto;
+    max-width: 1200px;
+}
+
+.plan {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 300px;
+    padding: 20px;
+    margin: 20px;
+    text-align: center;
+}
+
+.planContent {
+    text-align:left;
+}
+
+.price, .price-annual {
+    font-size: 24px;
+    color: #333;
+    margin: 10px 0;
+}
+
+.select-plan, .contact-sales {
+    background-color: #008CBA;
+    color: white;
+    padding: 15px 32px;
+    width: 150px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+
+}

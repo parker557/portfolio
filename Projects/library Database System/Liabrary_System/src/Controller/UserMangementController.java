@@ -1,0 +1,59 @@
+package Controller;
+import View.Initial;
+
+import javax.swing.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
+
+public class UserMangementController {
+    public static void activate(String id,Controller.OracleDB oracleDB) throws SQLException{
+        String query="SELECT * FROM USER_ACCOUNT WHERE LOGINID=\'"+id+"\'";
+        ResultSet rset = oracleDB.executeQuery(query);
+        if (!rset.next()) {
+            JOptionPane.showMessageDialog(null, "No records are found!");
+            //return false;
+        }else {
+            int state=rset.getInt(4);
+            if(state==0){
+                JOptionPane.showMessageDialog(null, "The user account has already been activated! Don't activate it again!");
+            }
+            else {
+                query = "UPDATE USER_ACCOUNT SET AccountStatus='0' WHERE LOGINID=\'" + id + "\'";
+                oracleDB.executeUpdate(query);
+                Date date = new Date();
+                Timestamp ts = new Timestamp(date.getTime());
+                query = "INSERT INTO REACTIVATION_RECORD VALUES(\'" + Initial.ID + "\',\'" + id + "\',\'activate\'," + "TIMESTAMP \'" + ts + "\')";
+                oracleDB.executeUpdate(query);
+                JOptionPane.showMessageDialog(null, "The user account is now activated!");
+            }
+        }
+
+            //return true;
+    }
+    public static void deactivate(String id,Controller.OracleDB oracleDB) throws SQLException{
+        String query="SELECT * FROM USER_ACCOUNT WHERE LOGINID=\'"+id+"\'";
+        ResultSet rset = oracleDB.executeQuery(query);
+        if (!rset.next()) {
+            JOptionPane.showMessageDialog(null, "No records are found!");
+            //return false;
+        }
+        else {
+            int state=rset.getInt(4);
+      if(state==1){
+          JOptionPane.showMessageDialog(null, "The user account has already been deactivated! Don't deactivated it again!");
+            }
+      else {
+          query = "UPDATE USER_ACCOUNT SET AccountStatus='1' WHERE LOGINID=\'" + id + "\'";
+          oracleDB.executeUpdate(query);
+          Date date = new Date();
+          Timestamp ts = new Timestamp(date.getTime());
+          query = "INSERT INTO REACTIVATION_RECORD VALUES(\'" + Initial.ID + "\',\'" + id + "\',\'deactivate\'," + "TIMESTAMP \'" + ts + "\')";
+          oracleDB.executeUpdate(query);
+          JOptionPane.showMessageDialog(null, "The useraccount is now deactivated!");
+          //return true;
+      }
+        }
+    }
+}

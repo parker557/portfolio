@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 
+This software is provided under the BSD License. Copyright (c) 2024 Xavier de Carné de Carnavalet.
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the original author is acknowledged. See JavaScript source for full license text.
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Application</title>
+    <!-- Bootstrap CSS for styling -->
+    <!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">-->
+    <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+
+    <script>
+
+        async function EC_generate() {
+                try {
+                    const keyPair = await crypto.subtle.generateKey({name: "ECDH", namedCurve: "P-384"}, true, ["deriveKey", "deriveBits"]);
+                    const exportedPrivateKey = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
+                    const exportedPublicKey = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
+                    const privateKeyString = btoa(JSON.stringify(exportedPrivateKey));
+                    const publicKeyString = btoa(JSON.stringify(exportedPublicKey));
+                    const output = { privateKey: privateKeyString, publicKey: publicKeyString };
+                    return output;
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            async function EC_sharedSecret(privateKey, publicKey) {
+                try {
+                    const privateKeyObj = JSON.parse(atob(privateKey));
+                    const publicKeyObj = JSON.parse(atob(publicKey));
+                    const importedPrivateKey = await crypto.subtle.importKey("jwk", privateKeyObj, { name: "ECDH", namedCurve: "P-384" }, true, ["deriveBits"]);
+                    const importedPublicKey = await crypto.subtle.importKey("jwk", publicKeyObj, { name: "ECDH", namedCurve: "P-384" }, true, []);
+                    const sharedSecret = await crypto.subtle.deriveBits({name: "ECDH", public: importedPublicKey}, importedPrivateKey, 384);
+                    const sharedSecretString = btoa(String.fromCharCode(...new Uint8Array(sharedSecret)));
+                    return sharedSecretString;
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            async function deriveKeys(sharedSecret, salt, user1, user2) { //user1 = self
+                try {
+                    // Convert the base64 encoded sharedSecret to an ArrayBuffer
+                    const sharedSecretBytes = new Uint8Array(atob(sharedSecret).split('').map(char => char.charCodeAt(0)));
+
+                    // Import the shared secret key
+                    const importedSecretKey = await crypto.subtle.importKey('raw', sharedSecretBytes.buffer, { name: 'HKDF' }, false, ['deriveKey']);
+
+                    const info1_2 = `${user1}_${user2}`;
+                    const info2_1 = `${user2}_${user1}`;
+
+                    const aesKey1_2 = await crypto.subtle.deriveKey({name: 'HKDF', hash: 'SHA-256', salt: new TextEncoder().encode(salt), info: new TextEncoder().encode('AES_'+info1_2)}, importedSecretKey, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
+                    const aesKey2_1 = await crypto.subtle.deriveKey({name: 'HKDF', hash: 'SHA-256', salt: new TextEncoder().encode(salt), info: new TextEncoder().encode('AES_'+info2_1)}, importedSecretKey, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
+                    const macKey1_2 = await crypto.subtle.deriveKey({name: 'HKDF', hash: 'SHA-256', salt: new TextEncoder().encode(salt), info: new TextEncoder().encode('MAC_'+info1_2)}, importedSecretKey, { name: 'HMAC', hash: { name: 'SHA-256' }, length: 256 }, true, ['sign', 'verify']);
+                    const macKey2_1 = await crypto.subtle.deriveKey({name: 'HKDF', hash: 'SHA-256', salt: new TextEncoder().encode(salt), info: new TextEncoder().encode('MAC_'+info2_1)}, importedSecretKey, { name: 'HMAC', hash: { name: 'SHA-256' }, length: 256 }, true, ['sign', 'verify']);
+
+                    const aesKey1_2_string = Array.from(new Uint8Array(await crypto.subtle.exportKey('raw', aesKey1_2)))
+                        .map(byte => byte.toString(16).padStart(2, '0'))
+                        .join('');
+                    const aesKey2_1_string = Array.from(new Uint8Array(await crypto.subtle.exportKey('raw', aesKey2_1)))
+                        .map(byte => byte.toString(16).padStart(2, '0'))
+                        .join('');
+                    const macKey1_2_string = Array.from(new Uint8Array(await crypto.subtle.exportKey('raw', macKey1_2)))
+                        .map(byte => byte.toString(16).padStart(2, '0'))
+                        .join('');
+                    const macKey2_1_string = Array.from(new Uint8Array(await crypto.subtle.exportKey('raw', macKey2_1)))
+                        .map(byte => byte.toString(16).padStart(2, '0'))
+                        .join('');
+
+                    return {
+                        aesKey1_2: aesKey1_2_string,
+                        aesKey2_1: aesKey2_1_string,
+                        macKey1_2: macKey1_2_string,
+                        macKey2_1: macKey2_1_string
+                    };
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            async function encodeIV(key, message) {
+                const encoder = new TextEncoder();
+                const keyData = encoder.encode(key);
+                const messageData = encoder.encode(message);
+
+                const cryptoKey = await crypto.subtle.importKey(
+                    'raw',
+                    keyData,
+                    { name: 'HMAC', hash: 'SHA-256' },
+                    true,
+                    ['sign']
+                );
+
+                const signature = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
+                const iv_string = btoa(String.fromCharCode(...new Uint8Array(signature)));
+                return iv_string.slice(0,12);
+            }
+
+            async function encryptMessage(plaintext, key, iv) {
+                console.log("plaintext: ",plaintext)
+                console.log("AES key: ",key)
+                console.log("iv: ",iv)
+                const encoder = new TextEncoder();
+                const data = encoder.encode(plaintext);
+                const ivArrayBuffer = new TextEncoder().encode(iv);
+                const keyArrayBuffer = new Uint8Array(key.length / 2);
+                for (let i = 0; i < key.length; i += 2) {
+                    keyArrayBuffer[i / 2] = parseInt(key.substr(i, 2), 16);
+                }
+
+                const cryptoKey = await crypto.subtle.importKey(
+                    'raw',
+                    keyArrayBuffer,
+                    { name: 'AES-GCM', length: 256 },
+                    true,
+                    ['encrypt']
+                );
+
+                const ciphertext = await crypto.subtle.encrypt(
+                    { name: 'AES-GCM', iv: ivArrayBuffer },
+                    cryptoKey,
+                    data
+                );
+
+                // Combine IV and ciphertext
+                const combined = new Uint8Array(12 + ciphertext.byteLength);
+                combined.set(ivArrayBuffer);
+                combined.set(new Uint8Array(ciphertext), 12);
+
+                return btoa(String.fromCharCode(...combined));
+            }
+
+            async function decryptMessage(message, key, iv) {
+                console.log("ciphertext: ",message)
+                console.log("AES key: ",key)
+                console.log("iv: ",iv)
+                const combined = atob(message).split('').map(char => char.charCodeAt(0));
+                const ivArrayBuffer = new TextEncoder().encode(iv);
+                const keyArrayBuffer = new Uint8Array(key.length / 2);
+
+                for (let i = 0; i < key.length; i += 2) {
+                    keyArrayBuffer[i / 2] = parseInt(key.substr(i, 2), 16);
+                }
+
+                const cryptoKey = await crypto.subtle.importKey(
+                    'raw',
+                    keyArrayBuffer,
+                    { name: 'AES-GCM', length: 256 },
+                    true,
+                    ['decrypt']
+                );
+
+                const ciphertext = combined.slice(12); // Remove the IV
+                const ciphertextArrayBuffer = new Uint8Array(ciphertext).buffer; // Convert to ArrayBuffer
+
+                const decryptedData = await crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv: ivArrayBuffer },
+                    cryptoKey,
+                    ciphertextArrayBuffer // Pass the ArrayBuffer
+                );
+
+                const decoder = new TextDecoder();
+                return decoder.decode(decryptedData);
+            }
+
+
+            window.onload = function() {
+                (async () => {
+                    if (localStorage.getItem("{{ sender_id }}_ECDH_key") != null) {
+                        const ECDH_key = JSON.parse(localStorage.getItem("{{ sender_id }}_ECDH_key"));
+                        console.log("MY PRIVATE KEY: "+ECDH_key.privateKey);
+                        console.log("MY PUBLIC KEY: "+ECDH_key.publicKey);
+                    } else {
+                        localStorage.setItem("{{ sender_id }}_ECDH_key", JSON.stringify(await EC_generate()));
+                    }
+                    var ECDH_key = JSON.parse(localStorage.getItem("{{ sender_id }}_ECDH_key"));
+                    fetch("/saveKey", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ publicKey: ECDH_key.publicKey})
+                    })
+
+                })();
+            };
+
+        </script>
+</head>
+<body>
+<div class="container mt-4">
+    <h2>Chat Application <small> - (<a href="/logout">Logout</a>)</small></h2>
+    <div class="chat-box">
+        <!-- Chat messages container -->
+        <div id="messages" style="border:1px solid #ccc; height:300px; margin-bottom:20px; overflow-y:scroll; padding:10px;"></div>
+        <!-- User selection dropdown -->
+        <select id="userList" class="form-control mb-2">
+            <option value="-1" disabled selected><i>Choose a contact</i></option>
+            <!-- User options populated here -->
+        </select>
+        <!-- Message input -->
+        <textarea id="messageInput" class="form-control mb-2" placeholder="Type a message..."></textarea>
+        <div class="d-flex justify-content-between">
+            <button onclick="sendMessage()" class="btn btn-primary">Send</button>
+            <div>
+                <button onclick="refreshKeys()" class="btn btn-secondary btn-sm">Refresh Keys</button>
+                <button onclick="eraseChat()" class="btn btn-danger btn-sm">Erase Chat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery for simplified JavaScript -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs" crossorigin="anonymous"></script>
+<script type="text/javascript">
+// Global variables
+let lastMessageId = 0;
+let peer_id = -1;
+const myID = {{ sender_id }};
+let userInfo = {};
+let iv_checker = -1;
+let encrypted_message_no = 0;
+
+
+// Ctrl+Enter to send message
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('messageInput').addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+});
+
+// Send message function
+function sendMessage() {
+
+    if (peer_id == -1) return; // Exit if no peer selected
+    const message = document.getElementById('messageInput').value;
+    (async () => {
+        await keyExchange();
+        const localStorage_key = '{{ sender_id }}_'+peer_id;
+        const AES_key = JSON.parse(localStorage.getItem(localStorage_key)).aes1_2;
+        const MAC_key = JSON.parse(localStorage.getItem(localStorage_key)).mac1_2;
+        var counter = JSON.parse(localStorage.getItem(localStorage_key)).counter;
+        var iv = await encodeIV(MAC_key, counter.toString());
+        const encrypted_message = await encryptMessage(message,AES_key,iv)
+        const payload = {
+            receiver_id: peer_id,
+            message_text: encrypted_message,
+            salt: JSON.parse(localStorage.getItem(localStorage_key)).salt,
+            iv: counter
+        };
+        console.log(payload)
+
+        const dataSet = JSON.parse(localStorage.getItem(localStorage_key));
+        dataSet.counter = ++counter
+        await localStorage.setItem(localStorage_key, JSON.stringify(dataSet));
+
+        fetch('/send_message', {
+            method: 'POST', // Specify the method
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        })
+        .then(response => {
+            if (!response.ok) {
+                // If the server response is not OK, throw an error
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); // Parse JSON response from the server
+        })
+        .then(data => {
+            console.log('Message sent:', data); // Log success message
+            document.getElementById('messageInput').value = ''; // Clear the input after sending
+        })
+        .catch(error => {
+            console.error('Error sending message:', error); // Log any errors
+        });
+    })()
+}
+ // Send log message function
+function sendLog(message) {
+    if (peer_id == -1) return; // Exit if no peer selected
+    (async () => {
+        await keyExchange();
+        const localStorage_key = '{{ sender_id }}_'+peer_id;
+        const AES_key = JSON.parse(localStorage.getItem(localStorage_key)).aes1_2;
+        const MAC_key = JSON.parse(localStorage.getItem(localStorage_key)).mac1_2;
+        var counter = JSON.parse(localStorage.getItem(localStorage_key)).counter;
+        var iv = await encodeIV(MAC_key, counter.toString());
+        const encrypted_message = await encryptMessage(message,AES_key,iv)
+        const payload = {
+            receiver_id: peer_id,
+            message_text: encrypted_message,
+            salt: JSON.parse(localStorage.getItem(localStorage_key)).salt,
+            iv: counter
+        };
+        console.log(payload)
+
+        const dataSet = JSON.parse(localStorage.getItem(localStorage_key));
+        dataSet.counter = ++counter
+        await localStorage.setItem(localStorage_key, JSON.stringify(dataSet));
+
+        fetch('/send_message', {
+            method: 'POST', // Specify the method
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        })
+        .then(response => {
+            if (!response.ok) {
+                // If the server response is not OK, throw an error
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); // Parse JSON response from the server
+        })
+        .then(data => {
+            console.log('Message sent:', data); // Log success message
+            document.getElementById('messageInput').value = ''; // Clear the input after sending
+        })
+        .catch(error => {
+            console.error('Error sending message:', error); // Log any errors
+        });
+    })()
+}
+
+// Refresh Keys function placeholder
+function refreshKeys() {
+    console.log('Refresh keys functionality will be implemented here.');
+    // Placeholder for refresh functionality
+    (async () => {
+        if (peer_id == -1) return;
+        await sendLog("Key change requirement")
+        var key_salt
+        // renew salt
+        await fetch("/newSalt", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ user_id: peer_id})
+        }).then(response => response.text()).then(salt => {
+                key_salt = salt;
+        }).catch(error => console.error('Error fetching messages:', error));
+        await fetch("/getSalt", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ user_id: peer_id})
+        }).then(response => response.text()).then(salt => {
+        }).catch(error => console.error('Error fetching messages:', error));
+        setTimeout(() => {
+            sendLog("Key change")
+        }, 2000);
+    })()
+}
+
+
+  // check and gen the key
+async function keyExchange() {
+    var target_public_key = ""
+    var key_salt = ""
+    var genSecret = false;
+    var genAES = false;
+    const localStorage_key = '{{ sender_id }}_'+peer_id;
+
+    try {
+        JSON.parse(localStorage.getItem("{{ sender_id }}_ECDH_key")).privateKey
+    }catch(e){
+        window.location.reload();
+    }
+
+    // get the salt or add the salt
+    await fetch("/getSalt", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ user_id: peer_id})
+    }).then(response => response.text()).then(salt => {
+            key_salt = salt;
+    }).catch(error => console.error('Error fetching messages:', error));
+
+
+        // get the target public key in database
+        await fetch(`/get_public_key?user_id=${peer_id}`).then(response => response.json()).then(data => {
+            target_public_key = data;
+        }).catch(error => console.error('Error fetching messages:', error));
+        // if target have public key
+        if (target_public_key != "" &&  target_public_key != null) {
+            // check the target user in local storage
+            if (localStorage.getItem(localStorage_key) !== null) {
+                var dataSet = JSON.parse(localStorage.getItem(localStorage_key));
+                // check the public key whether updated
+                if (target_public_key != dataSet.publicKey){
+                    genSecret = true;
+                    genAES = true;
+                } else {
+                    // check the salt
+                    if (key_salt != dataSet.salt){
+                        genAES = true;
+                    }
+                }
+            } else {
+                const nullData = {
+                    publicKey: '',
+                    shared_secret: '',
+                    salt: '',
+                    aes1_2: '',
+                    aes2_1: '',
+                    mac1_2: '',
+                    mac2_1: '',
+                    counter: 0
+                };
+                localStorage.setItem(localStorage_key, JSON.stringify(nullData));
+                genSecret = true
+                genAES = true;
+            }
+
+            if (genSecret) {
+                console.log("Create new shared secret");
+                // generate shared secret and storage in local
+                var dataSet = await JSON.parse(localStorage.getItem(localStorage_key));
+                dataSet.publicKey = target_public_key
+                var privateKey = JSON.parse(localStorage.getItem("{{ sender_id }}_ECDH_key")).privateKey;
+                dataSet.shared_secret = await EC_sharedSecret(privateKey, target_public_key)
+                dataSet.counter = 0
+
+                await localStorage.setItem(localStorage_key, JSON.stringify(dataSet));
+                console.log("new publicKey: ",JSON.parse(localStorage.getItem(localStorage_key)).publicKey)
+                console.log("new shared_secret: ",JSON.parse(localStorage.getItem(localStorage_key)).shared_secret)
+                console.log("new counter: ",JSON.parse(localStorage.getItem(localStorage_key)).counter)
+
+            }
+            if (genAES) {
+                console.log("Create new AES key")
+                // generate AES and MAC key and storage in local
+                var dataSet = await JSON.parse(localStorage.getItem(localStorage_key));
+                const keys = await deriveKeys(dataSet.shared_secret, key_salt, '{{ sender_id }}', peer_id);
+
+                dataSet.aes1_2 = keys.aesKey1_2;
+                dataSet.aes2_1 = keys.aesKey2_1;
+                dataSet.mac1_2 = keys.macKey1_2;
+                dataSet.mac2_1 = keys.macKey2_1;
+                dataSet.salt = key_salt;
+
+                console.log("new aes1_2: ",keys.aesKey1_2);
+                console.log("new aes2_1: ",keys.aesKey2_1);
+                console.log("new mac1_2: ",keys.macKey1_2);
+                console.log("new mac2_1: ",keys.macKey2_1);
+                console.log("new salt: ",key_salt);
+
+                await localStorage.setItem(localStorage_key, JSON.stringify(dataSet));
+                console.log(JSON.parse(localStorage.getItem(localStorage_key)))
+            }
+        }else{
+            // target didn't online
+            window.location.reload()
+        }
+
+}
+
+// Populate users function
+function populateUsers(users) {
+    const userListDropdown = document.getElementById("userList");
+    users.forEach(user => {
+        const option = new Option(user[1], user[0]); // username as text, user_id as value
+        userListDropdown.add(option);
+    });
+}
+
+// Fetch users from server
+$(document).ready(function() {
+    fetch('/users')
+        .then(response => response.json())
+        .then(data => {
+            data.users.forEach(user => {
+                userInfo[user[0]] = user[1]; // Map user_id to username
+            });
+            populateUsers(data.users);
+        })
+        .catch(error => console.error('Error fetching user info:', error));
+});
+
+// Handle user selection change
+document.getElementById('userList').addEventListener('change', event => {
+     (async () => {
+        peer_id = parseInt(event.target.value, 10); // Convert selected peer_id to integer
+        await keyExchange();
+        setTimeout(() => {
+
+        }, 500);
+        clearChatBox();
+        lastMessageId = 0;
+        fetchMessages(); // Fetch messages for the new selection
+
+    })();
+});
+
+// Clear chat box
+function clearChatBox() {
+    document.getElementById('messages').innerHTML = '';
+    iv_checker = -1;
+}
+
+// Fetch messages from server
+function fetchMessages() {
+    if (peer_id === -1) return; // Exit if no peer selected
+    fetch(`/fetch_messages?last_message_id=${lastMessageId}&peer_id=${peer_id}`)
+        .then(response => response.json())
+        .then(data => {
+            data.messages.forEach(message => {
+                displayMessage(message);
+                lastMessageId = message.message_id;
+            });
+        })
+        .catch(error => console.error('Error fetching messages:', error));
+}
+
+// Display a single message
+function displayMessage(message) {
+    console.log(message);
+    const messagesContainer = document.getElementById('messages');
+    const messageElement = document.createElement('div');
+    const messagesContainer2 = document.getElementById('messages');
+    const messageElement2 = document.createElement('div');
+    const localStorage_key = '{{ sender_id }}_'+peer_id;
+    const dataSet = JSON.parse(localStorage.getItem(localStorage_key));
+
+    var AES_key = ""
+    var MAC_key = ""
+
+    // Determine sender and receiver strings
+    const sender = message.sender_id == myID ? "me" : (userInfo[message.sender_id] || `User ${message.sender_id}`);
+    const receiver = message.receiver_id == myID ? "me" : (userInfo[message.receiver_id] || `User ${message.receiver_id}`);
+
+    // the key is too old
+    if (Number(message.salt) < Number(JSON.parse(localStorage.getItem(localStorage_key)).salt)){
+        messagesContainer.innerHTML = '';
+        encrypted_message_no++;
+        messageElement.textContent = 'Encrypted messages('+encrypted_message_no+')';
+        messagesContainer.appendChild(messageElement);
+    } else {
+        (async () => {
+            // update iv counter
+            if (message.iv >= JSON.parse(localStorage.getItem(localStorage_key)).counter){
+                dataSet.counter = message.iv + 1
+                await localStorage.setItem(localStorage_key, JSON.stringify(dataSet));
+                console.log(" ")
+            }
+            // new salt updated
+            if (Number(message.salt) > Number(JSON.parse(localStorage.getItem(localStorage_key)).salt)){
+                await keyExchange();
+                messageElement.textContent = 'System: Key Changed';
+                messagesContainer.appendChild(messageElement);
+                iv_checker = -1;
+            }
+
+            //iv checker
+            if (message.iv > iv_checker){
+                iv_checker = message.iv;
+            }else if (Number(message.salt) != Number(JSON.parse(localStorage.getItem(localStorage_key)).salt)){
+                messageElement.textContent = `warning: replay attack detected`;
+                messagesContainer.appendChild(messageElement);
+            }
+
+            // get the key for decryption
+            if (message.sender_id == myID) {
+                AES_key = await JSON.parse(localStorage.getItem(localStorage_key)).aes1_2
+                MAC_key = await JSON.parse(localStorage.getItem(localStorage_key)).mac1_2
+            } else {
+                AES_key = await JSON.parse(localStorage.getItem(localStorage_key)).aes2_1
+                MAC_key = await JSON.parse(localStorage.getItem(localStorage_key)).mac2_1
+            }
+
+            const iv = await encodeIV(MAC_key, message.iv.toString());
+            try {
+                const decrypted_message = await decryptMessage(message.message_text,AES_key,iv);
+                messageElement2.textContent = `From ${sender} to ${receiver}: ${decrypted_message}`;
+                messagesContainer2.appendChild(messageElement2);
+            }catch(error){
+                console.log()
+            }
+        })();
+    }
+}
+
+// Periodically fetch new messages every second
+setInterval(fetchMessages, 1000);
+
+// Erase Chat function using fetch API
+function eraseChat() {
+    if (peer_id === -1) return; // Exit if no peer selected
+    if (!confirm('Are you sure you want to erase the chat with '+userInfo[peer_id]+'?')) return; // Confirmation before erasing
+
+    fetch(`/erase_chat`, {
+        method: 'POST',  // A REST API should use POST if it leads to modifications
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ peer_id: peer_id })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json(); // Assuming the server responds with JSON
+    })
+    .then(data => {
+        console.log('Chat erased:', data);
+        clearChatBox(); // Clear the chat display
+    })
+    .catch(error => {
+        console.error('Error erasing chat:', error);
+    });
+}
+
+</script>
+</body>
+</html>

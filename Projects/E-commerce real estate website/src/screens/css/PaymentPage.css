@@ -1,0 +1,119 @@
+#payment {
+    display: flex;
+    height: fit-content;
+    background-image: url('../../image/Payment_Background.jpg'); /* 替换为你想要的背景图链接 */
+    background-size: cover;
+    background-position: center;
+}
+
+.paymentSuccess {
+    color: red;
+}
+
+/* 如果需要为背景图添加遮罩层，可以使用下面的样式 */
+#payment:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* height: 100%; */
+    background-color: rgba(0, 0, 0, 0.3); /* 调整透明度 */
+}
+
+.payment-container {
+    z-index: 1; /* 确保内容在遮罩层之上 */
+    margin: 5vh 10vw;
+    width: 80vw;
+
+    padding: 10px;
+    backdrop-filter: blur(3px);
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 45px rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.break {
+    margin-bottom: 15vh;
+}
+
+.payment-container form {
+    width: inherit;
+}
+
+.itemContainer {
+    margin: 5vh 5vw;
+}
+
+.userInfoContainer {
+    display: grid;
+    grid-template-columns: 30vw 30vw;
+    row-gap: 3vh;
+    margin: 5vh 5vw;
+}
+
+.grid-item {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+
+    /* border: 5px solid bisque; */
+}
+
+.grid-item label {
+    margin-bottom: 10px;
+}
+
+.grid-item input {
+    min-width: 200px;
+    min-height: 25px;
+    border-radius: 10px;
+}
+
+.grid-item textarea {
+    border-radius: 10px;
+}
+
+.option {
+    margin: 10px;
+}
+
+.option input {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.methodContainer {
+    display: grid;
+    grid-template-columns: 30vw 30vw;
+    row-gap: 3vh;
+    margin: 5vh 5vw;
+}
+
+/* .methodInfoText {
+    white-space: pre-line;
+} */
+
+.submitButton {
+  background-color: #405cf5;
+  border-radius: 6px;
+  border-width: 0;
+  box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset,rgba(50, 50, 93, .1) 0 2px 5px 0,rgba(0, 0, 0, .07) 0 1px 1px 0;
+  cursor: pointer;
+  text-align: center;
+  transform: translateZ(0);
+  transition: all .2s,box-shadow .08s ease-in;
+  width: fit-content;
+  height: fit-content;
+  color: white;
+  font-size: large;
+  padding: 10px 20px;
+}
+
+.submitButton:disabled {
+  cursor: default;
+}
+
+.submitButton:focus {
+  box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset, rgba(50, 50, 93, .2) 0 6px 15px 0, rgba(0, 0, 0, .1) 0 2px 2px 0, rgba(50, 151, 211, .3) 0 0 0 4px;
+}

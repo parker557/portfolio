@@ -1,0 +1,8 @@
+# 忽略 CustomPaper.js 文件的相对路径错误
+src/components/CustomPaper.js
+
+# 忽略 node_modules 目录下的所有文件
+node_modules/
+
+# 忽略 LoginPage.js 文件中 'LoginPage' 未定义的错误
+src/screens/LoginPage.js
