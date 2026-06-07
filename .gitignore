@@ -30,6 +30,7 @@ target/
 *.tgz
 *.zip
 *.rar
+**/.wrangler/
 
 # Large media
 *.mp4

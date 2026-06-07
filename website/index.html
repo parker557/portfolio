@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Zheng (John) Jiang portfolio: AI developer focused on LLM/VLM applications, robotics demos, model-serving APIs, and full-stack prototypes."
+    />
+    <title>Zheng (John) Jiang - AI Developer Portfolio</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Zheng Jiang portfolio home">Zheng (John) Jiang</a>
+      <nav aria-label="Primary navigation">
+        <a href="#projects">Projects</a>
+        <a href="#demos">Demos</a>
+        <a href="#experience">Experience</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero section">
+        <div class="hero-copy">
+          <p class="eyebrow">AI Developer - LLM/VLM - Robotics Demos</p>
+          <h1>AI systems I can<br />test, explain,<br />and hand off.</h1>
+          <p class="lead">
+            I build model-serving APIs, multimodal demos, robotics perception tools, and full-stack
+            prototypes. My recent work includes Qwen VLM serving, vLLM APIs, RealSense + SAM 3
+            tracking, Qwen3-VL batch detection, RAG/LoRA experiments, and Jetson AGX Orin testing.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#projects">View projects</a>
+            <a class="button secondary" href="./assets/Zheng_Jiang_Resume.pdf">Download resume</a>
+          </div>
+          <dl class="quick-facts" aria-label="Profile quick facts">
+            <div>
+              <dt>Education</dt>
+              <dd>BSc (Hons) in Computing, The Hong Kong Polytechnic University</dd>
+            </div>
+            <div>
+              <dt>Core stack</dt>
+              <dd>Python, FastAPI, vLLM, PyTorch, Docker, Linux, React, Node.js</dd>
+            </div>
+            <div>
+              <dt>Focus</dt>
+              <dd>AI app engineering, multimodal AI, robotics workflows, backend APIs</dd>
+            </div>
+          </dl>
+        </div>
+
+        <aside class="live-panel" aria-label="Featured demo preview">
+          <div class="panel-header">
+            <span>Featured demo</span>
+            <strong>Qwen3-VL DuoImage Detector</strong>
+          </div>
+          <div class="mini-gallery">
+            <figure>
+              <img src="./assets/qwen-ref.jpg" alt="Reference object image for Qwen3-VL demo" />
+              <figcaption>Reference</figcaption>
+            </figure>
+            <figure>
+              <img src="./assets/qwen-test.jpg" alt="Search image for Qwen3-VL demo" />
+              <figcaption>Search image</figcaption>
+            </figure>
+            <figure>
+              <img src="./assets/qwen-result.jpg" alt="Qwen3-VL rendered detection result" />
+              <figcaption>Rendered result</figcaption>
+            </figure>
+          </div>
+          <pre class="code-preview"><code>{
+  "pipeline": "reference-guided VLM detection",
+  "outputs": ["bbox JSON", "CSV summary", "rendered image"],
+  "checks": ["pair matching", "coordinate conversion", "timing"]
+}</code></pre>
+        </aside>
+      </section>
+
+      <section class="section compact" aria-labelledby="stack-title">
+        <h2 id="stack-title">Working Stack</h2>
+        <div class="skill-row">
+          <span>Python</span>
+          <span>FastAPI</span>
+          <span>vLLM</span>
+          <span>PyTorch</span>
+          <span>Hugging Face</span>
+          <span>Qwen VLM</span>
+          <span>Docker</span>
+          <span>Linux</span>
+          <span>React</span>
+          <span>Node.js</span>
+          <span>RealSense</span>
+          <span>Jetson AGX Orin</span>
+        </div>
+      </section>
+
+      <section class="section" id="projects" aria-labelledby="projects-title">
+        <div class="section-heading">
+          <p class="eyebrow">Selected work</p>
+          <h2 id="projects-title">Projects I can discuss in detail</h2>
+        </div>
+
+        <div class="project-grid">
+          <article class="project-card">
+            <img src="./assets/qwen-result.jpg" alt="Qwen3-VL detection output with bounding boxes" />
+            <div class="project-body">
+              <p class="tag">GenAI + Computer Vision</p>
+              <h3>Qwen3-VL DuoImage Detector</h3>
+              <p>
+                A Python tool for paired-image detection. It matches reference and search images,
+                asks Qwen3-VL for target objects, converts coordinates, and writes JSON, CSV/XLSX,
+                and rendered outputs.
+              </p>
+              <div class="card-actions">
+                <button class="button small" data-demo="qwen">Demo</button>
+                <a class="button small ghost" href="https://github.com/parker557/portfolio/tree/main/Projects/Qwen3-VL-DuoImage-Detector">Source</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="diagram property-diagram" aria-hidden="true">
+              <span>Owner</span>
+              <span>Issue</span>
+              <span>AI draft</span>
+              <span>Staff</span>
+            </div>
+            <div class="project-body">
+              <p class="tag">Full-stack AI App</p>
+              <h3>Property Management System</h3>
+              <p>
+                A Node.js and Socket.IO prototype with owner/staff dashboards, issue reporting,
+                chat, login sessions, and an OpenAI-compatible request path for AI-assisted replies.
+              </p>
+              <div class="card-actions">
+                <button class="button small" data-demo="property">Demo</button>
+                <a class="button small ghost" href="https://github.com/parker557/portfolio/tree/main/Projects/PropertyManagementSystem">Source</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="diagram security-diagram" aria-hidden="true">
+              <span>TLS</span>
+              <span>OTP</span>
+              <span>E2EE</span>
+              <span>Docker</span>
+            </div>
+            <div class="project-body">
+              <p class="tag">Security + Web</p>
+              <h3>E2EE Chat Network Application</h3>
+              <p>
+                A secure chat project around authentication, MFA/OTP, TLS deployment, database
+                setup, Docker Compose, and end-to-end encryption design.
+              </p>
+              <div class="card-actions">
+                <button class="button small" data-demo="chat">Demo</button>
+                <a class="button small ghost" href="https://github.com/parker557/portfolio/tree/main/Projects/E2EE%20chat%20network%20application">Source</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <img src="./assets/rentconnect-showcase.png" alt="RentConnect real estate app showcase" />
+            <div class="project-body">
+              <p class="tag">React + Firebase</p>
+              <h3>RentConnect Secure SaaS Platform</h3>
+              <p>
+                A real-estate web app built with React, Firebase, Firestore, Material UI, Redux
+                Toolkit, and payment-provider integration work.
+              </p>
+              <div class="card-actions">
+                <button class="button small" data-demo="rentconnect">Demo</button>
+                <a class="button small ghost" href="https://github.com/parker557/portfolio/tree/main/Projects/E-commerce%20real%20estate%20website">Source</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="diagram finance-diagram" aria-hidden="true">
+              <span>Input</span>
+              <span>LLM</span>
+              <span>Report</span>
+              <span>Review</span>
+            </div>
+            <div class="project-body">
+              <p class="tag">AI Workflow</p>
+              <h3>AI Finance Advisor</h3>
+              <p>
+                A local Python reporting workflow that calls a language model API and produces
+                Markdown reports from local history/configuration files. It is a workflow demo,
+                not financial advice.
+              </p>
+              <div class="card-actions">
+                <button class="button small" data-demo="finance">Demo</button>
+                <a class="button small ghost" href="https://github.com/parker557/portfolio/tree/main/Projects/finance_advise">Source</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <canvas class="tracking-canvas" id="trackingCanvas" width="560" height="280" aria-label="Animated object tracking demo"></canvas>
+            <div class="project-body">
+              <p class="tag">Robotics Perception</p>
+              <h3>RealSense + SAM 3 Tracking Prototype</h3>
+              <p>
+                A robotics perception workflow from recent work: color/depth input, mask tracking,
+                bounding boxes, 2D/3D anchors, pose cues, and structured object-state output.
+              </p>
+              <div class="card-actions">
+                <button class="button small" data-demo="tracking">Demo</button>
+                <button class="button small ghost" id="toggleTracking">Animate</button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="demos" aria-labelledby="demo-title">
+        <div class="section-heading">
+          <p class="eyebrow">Interactive preview</p>
+          <h2 id="demo-title">Demo panel</h2>
+        </div>
+        <div class="demo-shell">
+          <div class="demo-tabs" role="tablist" aria-label="Portfolio demos">
+            <button class="active" data-demo="qwen" role="tab">Qwen3-VL</button>
+            <button data-demo="property" role="tab">Agent workflow</button>
+            <button data-demo="tracking" role="tab">Tracking</button>
+            <button data-demo="chat" role="tab">Secure chat</button>
+            <button data-demo="rentconnect" role="tab">RentConnect</button>
+            <button data-demo="finance" role="tab">AI reports</button>
+          </div>
+          <div class="demo-output" id="demoOutput" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="section two-column" id="experience" aria-labelledby="experience-title">
+        <div>
+          <p class="eyebrow">Experience</p>
+          <h2 id="experience-title">Recent engineering work</h2>
+        </div>
+        <div class="timeline">
+          <article>
+            <h3>Beijing Qianjue Technology - AI Developer Experience</h3>
+            <p>
+              Built robotics AI demos around Qwen-family models, FastAPI, Gradio, vLLM,
+              RealSense/SAM tracking, batch detection scripts, and edge AI testing on Jetson AGX
+              Orin and RK3588/RKNN devices.
+            </p>
+          </article>
+          <article>
+            <h3>Dream Technology Solutions - Co-Founder and Infrastructure Lead</h3>
+            <p>
+              Handled client requirements, server environments, ESXi/RAID/Docker/Nginx setups,
+              reverse proxies, tunneling, game server deployment, testing, support, and handoff
+              documentation.
+            </p>
+          </article>
+          <article>
+            <h3>Microsoft and WeDragon - AI/Software Internships</h3>
+            <p>
+              Supported LLM deployment experiments, cloud server maintenance, AI course materials,
+              Jupyter labs, exams, project-site maintenance, and documentation updates.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section contact" id="contact" aria-labelledby="contact-title">
+        <div>
+          <p class="eyebrow">Contact</p>
+          <h2 id="contact-title">Open to AI developer and software engineering roles.</h2>
+          <p>
+            Best fit: LLM/VLM application engineering, Python/FastAPI services, robotics demo
+            tooling, multimodal workflows, and full-stack prototypes that need practical delivery.
+          </p>
+        </div>
+        <div class="contact-actions">
+          <a class="button primary" href="mailto:transpxvs@gmail.com">Email me</a>
+          <a class="button secondary" href="https://github.com/parker557/portfolio">GitHub portfolio</a>
+          <a class="button secondary" href="https://www.linkedin.com/in/zheng-jiang-921aa51b2/">LinkedIn</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Zheng (John) Jiang</span>
+      <span>AI developer portfolio</span>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

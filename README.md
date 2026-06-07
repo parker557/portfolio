@@ -4,6 +4,8 @@ Selected AI and software projects from my coursework, startup work, and personal
 
 Most visitors should start with [Projects/README.md](./Projects/README.md). It gives a short index of the work I would discuss in an interview, plus notes on what is runnable, what is coursework, and what needs local configuration.
 
+The personal website version is in [website/](./website/). It is a static Cloudflare Pages-ready site with project case studies, demo buttons, screenshots, and a resume download link.
+
 ## What Is Here
 
 - GenAI and computer vision experiments, including Qwen3-VL paired-image detection.
