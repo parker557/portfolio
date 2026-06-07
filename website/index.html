@@ -5,55 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Zheng (John) Jiang portfolio: AI developer focused on LLM/VLM applications, robotics demos, model-serving APIs, and full-stack prototypes."
+      content="Zheng (John) Jiang portfolio: AI developer work across LLM/VLM applications, model-serving APIs, robotics perception demos, and full-stack prototypes."
     />
     <title>Zheng (John) Jiang - AI Developer Portfolio</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="#top" aria-label="Zheng Jiang portfolio home">Zheng (John) Jiang</a>
+      <a class="brand" href="#top" aria-label="Zheng Jiang portfolio home">
+        <span>Zheng (John) Jiang</span>
+        <small>AI Developer</small>
+      </a>
       <nav aria-label="Primary navigation">
         <a href="#projects">Projects</a>
         <a href="#demos">Demos</a>
+        <a href="#notes">Notes</a>
         <a href="#experience">Experience</a>
         <a href="#contact">Contact</a>
+        <a class="nav-resume" href="./assets/Zheng_Jiang_Resume.pdf">Resume</a>
       </nav>
     </header>
 
     <main id="top">
       <section class="hero section">
         <div class="hero-copy">
-          <p class="eyebrow">AI Developer - LLM/VLM - Robotics Demos</p>
-          <h1>AI systems I can<br />test, explain,<br />and hand off.</h1>
+          <p class="eyebrow">Model serving - multimodal AI - robotics prototypes</p>
+          <h1>I build AI demos with enough engineering around them to be tested, reused, and handed off.</h1>
           <p class="lead">
-            I build model-serving APIs, multimodal demos, robotics perception tools, and full-stack
-            prototypes. My recent work includes Qwen VLM serving, vLLM APIs, RealSense + SAM 3
-            tracking, Qwen3-VL batch detection, RAG/LoRA experiments, and Jetson AGX Orin testing.
+            My recent work is practical rather than research-only: Qwen-family VLM demos, FastAPI
+            and vLLM model APIs, Qwen3-VL batch detection, RealSense + SAM 3 tracking, Jetson AGX
+            Orin tests, RAG/LoRA experiments, and full-stack prototypes with clear run notes.
           </p>
+
           <div class="hero-actions">
-            <a class="button primary" href="#projects">View projects</a>
+            <a class="button primary" href="#projects">Review project notes</a>
             <a class="button secondary" href="./assets/Zheng_Jiang_Resume.pdf">Download resume</a>
+            <a class="button secondary" href="https://github.com/parker557/portfolio">GitHub portfolio</a>
           </div>
+
           <dl class="quick-facts" aria-label="Profile quick facts">
             <div>
               <dt>Education</dt>
-              <dd>BSc (Hons) in Computing, The Hong Kong Polytechnic University</dd>
+              <dd>BSc (Honours) in Computing, The Hong Kong Polytechnic University</dd>
+            </div>
+            <div>
+              <dt>Best fit</dt>
+              <dd>Entry-level AI developer, GenAI developer, AI application engineer, software engineer</dd>
             </div>
             <div>
               <dt>Core stack</dt>
-              <dd>Python, FastAPI, vLLM, PyTorch, Docker, Linux, React, Node.js</dd>
-            </div>
-            <div>
-              <dt>Focus</dt>
-              <dd>AI app engineering, multimodal AI, robotics workflows, backend APIs</dd>
+              <dd>Python, FastAPI, vLLM, PyTorch, Docker, Linux, React, Node.js, Nginx</dd>
             </div>
           </dl>
         </div>
 
-        <aside class="live-panel" aria-label="Featured demo preview">
-          <div class="panel-header">
-            <span>Featured demo</span>
+        <aside class="build-panel" aria-label="Current portfolio highlight">
+          <div class="panel-topline">
+            <span>Latest build note</span>
             <strong>Qwen3-VL DuoImage Detector</strong>
           </div>
           <div class="mini-gallery">
@@ -67,19 +75,22 @@
             </figure>
             <figure>
               <img src="./assets/qwen-result.jpg" alt="Qwen3-VL rendered detection result" />
-              <figcaption>Rendered result</figcaption>
+              <figcaption>Rendered output</figcaption>
             </figure>
           </div>
-          <pre class="code-preview"><code>{
-  "pipeline": "reference-guided VLM detection",
-  "outputs": ["bbox JSON", "CSV summary", "rendered image"],
-  "checks": ["pair matching", "coordinate conversion", "timing"]
-}</code></pre>
+          <div class="build-log">
+            <p><strong>Problem:</strong> compare a reference object against a larger search image.</p>
+            <p><strong>Built:</strong> pairing, prompt construction, JSON parsing, coordinate conversion, CSV/XLSX summaries, and rendered boxes.</p>
+            <p><strong>Why it matters:</strong> the output can be checked visually and by file, which makes the demo easier to debug and hand off.</p>
+          </div>
         </aside>
       </section>
 
       <section class="section compact" aria-labelledby="stack-title">
-        <h2 id="stack-title">Working Stack</h2>
+        <div class="section-heading tight">
+          <p class="eyebrow">Working stack</p>
+          <h2 id="stack-title">Tools I have used in shipped or demo work</h2>
+        </div>
         <div class="skill-row">
           <span>Python</span>
           <span>FastAPI</span>
@@ -87,40 +98,73 @@
           <span>PyTorch</span>
           <span>Hugging Face</span>
           <span>Qwen VLM</span>
+          <span>Gradio</span>
           <span>Docker</span>
           <span>Linux</span>
+          <span>Nginx</span>
           <span>React</span>
           <span>Node.js</span>
+          <span>Firebase</span>
           <span>RealSense</span>
+          <span>SAM 3</span>
           <span>Jetson AGX Orin</span>
         </div>
+      </section>
+
+      <section class="section evidence-band" aria-label="Portfolio evidence">
+        <article>
+          <span class="number">6</span>
+          <p>project notes with source links or demo previews</p>
+        </article>
+        <article>
+          <span class="number">3</span>
+          <p>AI workstreams: model APIs, multimodal detection, robotics perception</p>
+        </article>
+        <article>
+          <span class="number">1</span>
+          <p>static Cloudflare Pages site, no embedded API keys, resume included</p>
+        </article>
       </section>
 
       <section class="section" id="projects" aria-labelledby="projects-title">
         <div class="section-heading">
           <p class="eyebrow">Selected work</p>
-          <h2 id="projects-title">Projects I can discuss in detail</h2>
+          <h2 id="projects-title">Project notes a recruiter or engineer can skim quickly</h2>
+          <p>
+            I kept these short on purpose. Each card gives the problem, what I built, and a piece
+            of evidence. The demo buttons below update the interactive panel without leaving the page.
+          </p>
         </div>
 
         <div class="project-grid">
-          <article class="project-card">
+          <article class="project-card" data-project="qwen">
             <img src="./assets/qwen-result.jpg" alt="Qwen3-VL detection output with bounding boxes" />
             <div class="project-body">
-              <p class="tag">GenAI + Computer Vision</p>
+              <p class="tag">GenAI + computer vision</p>
               <h3>Qwen3-VL DuoImage Detector</h3>
-              <p>
-                A Python tool for paired-image detection. It matches reference and search images,
-                asks Qwen3-VL for target objects, converts coordinates, and writes JSON, CSV/XLSX,
-                and rendered outputs.
-              </p>
+              <dl class="project-notes">
+                <div>
+                  <dt>Problem</dt>
+                  <dd>Find objects in a search image that match a separate reference image.</dd>
+                </div>
+                <div>
+                  <dt>Built</dt>
+                  <dd>Python workflow for pairing, VLM prompting, JSON parsing, coordinate conversion, and rendered outputs.</dd>
+                </div>
+                <div>
+                  <dt>Evidence</dt>
+                  <dd>Reference image, search image, result image, JSON, CSV/XLSX summary path.</dd>
+                </div>
+              </dl>
               <div class="card-actions">
                 <button class="button small" data-demo="qwen">Demo</button>
+                <button class="button small ghost" data-project-open="qwen">Notes</button>
                 <a class="button small ghost" href="https://github.com/parker557/portfolio/tree/main/Projects/Qwen3-VL-DuoImage-Detector">Source</a>
               </div>
             </div>
           </article>
 
-          <article class="project-card">
+          <article class="project-card" data-project="property">
             <div class="diagram property-diagram" aria-hidden="true">
               <span>Owner</span>
               <span>Issue</span>
@@ -128,20 +172,58 @@
               <span>Staff</span>
             </div>
             <div class="project-body">
-              <p class="tag">Full-stack AI App</p>
+              <p class="tag">Full-stack AI app</p>
               <h3>Property Management System</h3>
-              <p>
-                A Node.js and Socket.IO prototype with owner/staff dashboards, issue reporting,
-                chat, login sessions, and an OpenAI-compatible request path for AI-assisted replies.
-              </p>
+              <dl class="project-notes">
+                <div>
+                  <dt>Problem</dt>
+                  <dd>Turn tenant issues and staff updates into a visible workflow.</dd>
+                </div>
+                <div>
+                  <dt>Built</dt>
+                  <dd>Node.js, Socket.IO, login sessions, owner/staff dashboards, chat, and an AI reply path.</dd>
+                </div>
+                <div>
+                  <dt>Evidence</dt>
+                  <dd>Runnable prototype structure with end-to-end request flow.</dd>
+                </div>
+              </dl>
               <div class="card-actions">
                 <button class="button small" data-demo="property">Demo</button>
+                <button class="button small ghost" data-project-open="property">Notes</button>
                 <a class="button small ghost" href="https://github.com/parker557/portfolio/tree/main/Projects/PropertyManagementSystem">Source</a>
               </div>
             </div>
           </article>
 
-          <article class="project-card">
+          <article class="project-card" data-project="tracking">
+            <canvas class="tracking-canvas" id="trackingCanvas" width="560" height="280" aria-label="Animated object tracking demo"></canvas>
+            <div class="project-body">
+              <p class="tag">Robotics perception</p>
+              <h3>RealSense + SAM 3 Tracking Prototype</h3>
+              <dl class="project-notes">
+                <div>
+                  <dt>Problem</dt>
+                  <dd>Keep object state usable for robotics demos, not just visible on screen.</dd>
+                </div>
+                <div>
+                  <dt>Built</dt>
+                  <dd>Color/depth input notes, mask tracking, bbox, 2D/3D anchor fields, and pose cues.</dd>
+                </div>
+                <div>
+                  <dt>Evidence</dt>
+                  <dd>Canvas preview and structured object-state format shown in the demo panel.</dd>
+                </div>
+              </dl>
+              <div class="card-actions">
+                <button class="button small" data-demo="tracking">Demo</button>
+                <button class="button small ghost" data-project-open="tracking">Notes</button>
+                <button class="button small ghost" id="toggleTracking" type="button">Animate</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card" data-project="chat">
             <div class="diagram security-diagram" aria-hidden="true">
               <span>TLS</span>
               <span>OTP</span>
@@ -149,36 +231,58 @@
               <span>Docker</span>
             </div>
             <div class="project-body">
-              <p class="tag">Security + Web</p>
+              <p class="tag">Security + web</p>
               <h3>E2EE Chat Network Application</h3>
-              <p>
-                A secure chat project around authentication, MFA/OTP, TLS deployment, database
-                setup, Docker Compose, and end-to-end encryption design.
-              </p>
+              <dl class="project-notes">
+                <div>
+                  <dt>Problem</dt>
+                  <dd>Design a chat app where transport, login, and message handling can be reviewed.</dd>
+                </div>
+                <div>
+                  <dt>Built</dt>
+                  <dd>Flask, MySQL, Docker Compose, TLS/Nginx setup, OTP/MFA flow, and encryption design notes.</dd>
+                </div>
+                <div>
+                  <dt>Evidence</dt>
+                  <dd>Deployment notes and security flow documentation in the project folder.</dd>
+                </div>
+              </dl>
               <div class="card-actions">
                 <button class="button small" data-demo="chat">Demo</button>
+                <button class="button small ghost" data-project-open="chat">Notes</button>
                 <a class="button small ghost" href="https://github.com/parker557/portfolio/tree/main/Projects/E2EE%20chat%20network%20application">Source</a>
               </div>
             </div>
           </article>
 
-          <article class="project-card">
+          <article class="project-card" data-project="rentconnect">
             <img src="./assets/rentconnect-showcase.png" alt="RentConnect real estate app showcase" />
             <div class="project-body">
               <p class="tag">React + Firebase</p>
               <h3>RentConnect Secure SaaS Platform</h3>
-              <p>
-                A real-estate web app built with React, Firebase, Firestore, Material UI, Redux
-                Toolkit, and payment-provider integration work.
-              </p>
+              <dl class="project-notes">
+                <div>
+                  <dt>Problem</dt>
+                  <dd>Build a real-estate workflow with accounts, listings, and a modern web UI.</dd>
+                </div>
+                <div>
+                  <dt>Built</dt>
+                  <dd>React, Firebase Auth, Firestore, Material UI, Redux Toolkit, and payment wiring.</dd>
+                </div>
+                <div>
+                  <dt>Evidence</dt>
+                  <dd>Showcase image plus source folder with app structure.</dd>
+                </div>
+              </dl>
               <div class="card-actions">
                 <button class="button small" data-demo="rentconnect">Demo</button>
+                <button class="button small ghost" data-project-open="rentconnect">Notes</button>
                 <a class="button small ghost" href="https://github.com/parker557/portfolio/tree/main/Projects/E-commerce%20real%20estate%20website">Source</a>
               </div>
             </div>
           </article>
 
-          <article class="project-card">
+          <article class="project-card" data-project="finance">
             <div class="diagram finance-diagram" aria-hidden="true">
               <span>Input</span>
               <span>LLM</span>
@@ -186,42 +290,53 @@
               <span>Review</span>
             </div>
             <div class="project-body">
-              <p class="tag">AI Workflow</p>
+              <p class="tag">AI workflow</p>
               <h3>AI Finance Advisor</h3>
-              <p>
-                A local Python reporting workflow that calls a language model API and produces
-                Markdown reports from local history/configuration files. It is a workflow demo,
-                not financial advice.
-              </p>
+              <dl class="project-notes">
+                <div>
+                  <dt>Problem</dt>
+                  <dd>Turn local financial context into a structured report draft.</dd>
+                </div>
+                <div>
+                  <dt>Built</dt>
+                  <dd>Python workflow that reads local inputs, calls an LLM API, and writes Markdown reports.</dd>
+                </div>
+                <div>
+                  <dt>Evidence</dt>
+                  <dd>Report skeleton and review-first workflow. It is not financial advice.</dd>
+                </div>
+              </dl>
               <div class="card-actions">
                 <button class="button small" data-demo="finance">Demo</button>
+                <button class="button small ghost" data-project-open="finance">Notes</button>
                 <a class="button small ghost" href="https://github.com/parker557/portfolio/tree/main/Projects/finance_advise">Source</a>
               </div>
             </div>
           </article>
-
-          <article class="project-card">
-            <canvas class="tracking-canvas" id="trackingCanvas" width="560" height="280" aria-label="Animated object tracking demo"></canvas>
-            <div class="project-body">
-              <p class="tag">Robotics Perception</p>
-              <h3>RealSense + SAM 3 Tracking Prototype</h3>
-              <p>
-                A robotics perception workflow from recent work: color/depth input, mask tracking,
-                bounding boxes, 2D/3D anchors, pose cues, and structured object-state output.
-              </p>
-              <div class="card-actions">
-                <button class="button small" data-demo="tracking">Demo</button>
-                <button class="button small ghost" id="toggleTracking">Animate</button>
-              </div>
-            </div>
-          </article>
         </div>
+
+        <aside class="project-detail" id="projectDetail" aria-live="polite">
+          <div>
+            <p class="eyebrow">Project note</p>
+            <h3 id="projectDetailTitle">Select a project note</h3>
+          </div>
+          <div id="projectDetailBody">
+            <p>
+              Use the Notes buttons above to open a short engineering note. I wrote these as
+              practical handoff notes rather than marketing copy.
+            </p>
+          </div>
+        </aside>
       </section>
 
       <section class="section" id="demos" aria-labelledby="demo-title">
         <div class="section-heading">
           <p class="eyebrow">Interactive preview</p>
           <h2 id="demo-title">Demo panel</h2>
+          <p>
+            These are static previews, not live model inference. I use them to show inputs,
+            outputs, and the small checks around each project.
+          </p>
         </div>
         <div class="demo-shell">
           <div class="demo-tabs" role="tablist" aria-label="Portfolio demos">
@@ -236,6 +351,40 @@
         </div>
       </section>
 
+      <section class="section two-column" id="notes" aria-labelledby="notes-title">
+        <div>
+          <p class="eyebrow">How I work</p>
+          <h2 id="notes-title">A few notes that make the work less generic</h2>
+        </div>
+        <div class="note-stack">
+          <article>
+            <h3>I try to leave evidence behind.</h3>
+            <p>
+              For AI demos, I care about files and screenshots that let someone else verify the
+              result: input pairs, rendered outputs, logs, CSV summaries, timing notes, and clear
+              setup steps.
+            </p>
+          </article>
+          <article>
+            <h3>I use AI tools, but I still own the result.</h3>
+            <p>
+              I use Codex, Antigravity, Hermes OpenClaw, and Coze for scaffolding, debugging,
+              workflow drafts, and documentation. The useful habit is checking assumptions,
+              running the code, and trimming generated text until it sounds like something I would
+              actually say.
+            </p>
+          </article>
+          <article>
+            <h3>I like messy prototype work.</h3>
+            <p>
+              My recent work often sits between model behavior, cameras, APIs, Linux boxes, and
+              demo deadlines. I am comfortable making the first version work, then writing enough
+              notes that the next person is not guessing.
+            </p>
+          </article>
+        </div>
+      </section>
+
       <section class="section two-column" id="experience" aria-labelledby="experience-title">
         <div>
           <p class="eyebrow">Experience</p>
@@ -245,17 +394,18 @@
           <article>
             <h3>Beijing Qianjue Technology - AI Developer Experience</h3>
             <p>
-              Built robotics AI demos around Qwen-family models, FastAPI, Gradio, vLLM,
+              Worked on robotics AI demos around Qwen-family models, FastAPI, Gradio, vLLM,
               RealSense/SAM tracking, batch detection scripts, and edge AI testing on Jetson AGX
-              Orin and RK3588/RKNN devices.
+              Orin and RK3588/RKNN devices. The work was hands-on: setup, scripts, outputs, reports,
+              timing checks, and demo maintenance.
             </p>
           </article>
           <article>
             <h3>Dream Technology Solutions - Co-Founder and Infrastructure Lead</h3>
             <p>
-              Handled client requirements, server environments, ESXi/RAID/Docker/Nginx setups,
-              reverse proxies, tunneling, game server deployment, testing, support, and handoff
-              documentation.
+              Handled client requirements and infrastructure setup for server environments,
+              ESXi/RAID/Docker/Nginx, reverse proxies, tunneling, BeamNG and Minecraft server
+              deployments, mod testing, troubleshooting, and handoff documentation.
             </p>
           </article>
           <article>
@@ -287,7 +437,7 @@
 
     <footer class="site-footer">
       <span>Zheng (John) Jiang</span>
-      <span>AI developer portfolio</span>
+      <span>Built as a static Cloudflare Pages portfolio</span>
     </footer>
 
     <script src="./app.js"></script>

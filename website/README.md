@@ -2,6 +2,13 @@
 
 Static personal website for Cloudflare Pages.
 
+## Design Notes
+
+- Keep the site project-first: screenshots, source links, demo previews, and handoff notes come before broad claims.
+- Avoid generic AI-style copy: use concrete project context, short sentences, and honest "next improvement" notes.
+- Keep it static and deployable on Cloudflare Pages. No API keys, no live model calls, and no backend dependency.
+- Demo buttons are client-side previews only. They are meant to show workflow shape, not production inference.
+
 ## Local Preview
 
 From this folder:

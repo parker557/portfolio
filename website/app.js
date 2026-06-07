@@ -11,12 +11,11 @@ const demos = {
         <pre class="demo-log"><code>{
   "task": "find objects matching the reference image",
   "model": "Qwen3-VL-8B-Instruct",
-  "steps": [
+  "checks": [
     "auto-pair testN with testN_ref",
-    "construct VLM prompt",
     "parse JSON output",
     "convert normalized coordinates to pixels",
-    "save rendered image, JSON, CSV/XLSX"
+    "write JSON, CSV/XLSX, and rendered image"
   ]
 }</code></pre>
       </div>
@@ -119,26 +118,112 @@ docker-compose services: webapp, db, nginx</code></pre>
   }
 };
 
+const projectDetails = {
+  qwen: {
+    title: "Qwen3-VL DuoImage Detector",
+    body: `
+      <ul>
+        <li>I wanted the output to be checkable, so the script writes both machine-readable files and a rendered image.</li>
+        <li>The useful engineering work is around the model call: pairing images, normalizing prompts, parsing JSON, and converting coordinates.</li>
+        <li>Next improvement: add a small evaluation folder with expected boxes and failure examples.</li>
+      </ul>
+    `
+  },
+  property: {
+    title: "Property Management System",
+    body: `
+      <ul>
+        <li>This project is a practical full-stack workflow: report, store, notify, draft, respond.</li>
+        <li>The AI path is intentionally visible rather than hidden behind a magic button, which makes debugging easier.</li>
+        <li>Next improvement: add better audit logs and role-based permissions around issue changes.</li>
+      </ul>
+    `
+  },
+  tracking: {
+    title: "RealSense + SAM 3 Tracking Prototype",
+    body: `
+      <ul>
+        <li>The goal is not just segmentation, but structured state that another robotics component can consume.</li>
+        <li>I worked around camera input, mask output, 2D/3D anchors, bounding boxes, and pose hints.</li>
+        <li>Next improvement: store short clips and compare tracking stability across lighting and distance changes.</li>
+      </ul>
+    `
+  },
+  chat: {
+    title: "E2EE Chat Network Application",
+    body: `
+      <ul>
+        <li>The project helped me practice deployment-level thinking: TLS, Docker Compose, database setup, and authentication flow.</li>
+        <li>I treated the security pieces as parts of a system instead of isolated checkboxes.</li>
+        <li>Next improvement: add clearer threat-model notes and automated setup checks.</li>
+      </ul>
+    `
+  },
+  rentconnect: {
+    title: "RentConnect Secure SaaS Platform",
+    body: `
+      <ul>
+        <li>This is the frontend-heavy project I use to show React, Firebase, app structure, state, and UI workflows.</li>
+        <li>The interesting part is connecting authentication, Firestore data, listing UI, and payment-provider wiring.</li>
+        <li>Next improvement: tighten the README with screenshots for each role and setup path.</li>
+      </ul>
+    `
+  },
+  finance: {
+    title: "AI Finance Advisor",
+    body: `
+      <ul>
+        <li>This is a local AI workflow experiment, not a product and not financial advice.</li>
+        <li>I used it to practice structured prompts, local files, repeatable Markdown output, and review-first AI writing.</li>
+        <li>Next improvement: separate data loading, model call, and report rendering into testable modules.</li>
+      </ul>
+    `
+  }
+};
+
 const demoOutput = document.getElementById("demoOutput");
 const demoButtons = document.querySelectorAll("[data-demo]");
+const projectDetailTitle = document.getElementById("projectDetailTitle");
+const projectDetailBody = document.getElementById("projectDetailBody");
 
-function setDemo(name, shouldScroll = true) {
+function setDemo(name, shouldScroll = true, shouldUpdateHash = true) {
   const demo = demos[name] || demos.qwen;
   demoOutput.innerHTML = `<h3>${demo.title}</h3>${demo.body}`;
   demoButtons.forEach((button) => {
     button.classList.toggle("active", button.dataset.demo === name && button.closest(".demo-tabs"));
   });
+
   if (name === "tracking") {
     const canvas = document.getElementById("demoTrackingCanvas");
     if (canvas) drawTracking(canvas, performance.now() / 1000);
   }
+
+  if (shouldUpdateHash) {
+    history.replaceState(null, "", `#demo-${name}`);
+  }
+
   if (shouldScroll) {
     document.getElementById("demos").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 }
 
+function openProjectNote(name, shouldScroll = true) {
+  const detail = projectDetails[name] || projectDetails.qwen;
+  projectDetailTitle.textContent = detail.title;
+  projectDetailBody.innerHTML = detail.body;
+  history.replaceState(null, "", `#note-${name}`);
+
+  if (shouldScroll) {
+    document.getElementById("projectDetail").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+
 demoButtons.forEach((button) => {
   button.addEventListener("click", () => setDemo(button.dataset.demo));
+});
+
+document.querySelectorAll("[data-project-open]").forEach((button) => {
+  button.addEventListener("click", () => openProjectNote(button.dataset.projectOpen));
 });
 
 let trackingOn = false;
@@ -149,10 +234,10 @@ function drawTracking(canvas, t = 0) {
   const w = canvas.width;
   const h = canvas.height;
   ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "#eef3f8";
+  ctx.fillStyle = "#eef3e9";
   ctx.fillRect(0, 0, w, h);
 
-  ctx.strokeStyle = "#d5dde8";
+  ctx.strokeStyle = "#d5dccd";
   ctx.lineWidth = 1;
   for (let x = 40; x < w; x += 52) {
     ctx.beginPath();
@@ -172,27 +257,27 @@ function drawTracking(canvas, t = 0) {
   const bw = 180;
   const bh = 96;
 
-  ctx.fillStyle = "rgba(19, 124, 120, 0.18)";
-  ctx.strokeStyle = "#137c78";
+  ctx.fillStyle = "rgba(22, 111, 106, 0.18)";
+  ctx.strokeStyle = "#166f6a";
   ctx.lineWidth = 3;
   ctx.beginPath();
   ctx.ellipse(cx, cy, bw / 2, bh / 2, Math.sin(t) * 0.08, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
 
-  ctx.strokeStyle = "#315d9f";
+  ctx.strokeStyle = "#2f5f98";
   ctx.lineWidth = 3;
   ctx.strokeRect(cx - bw / 2, cy - bh / 2, bw, bh);
 
-  ctx.fillStyle = "#b67318";
+  ctx.fillStyle = "#a86620";
   ctx.beginPath();
   ctx.arc(cx, cy, 6, 0, Math.PI * 2);
   ctx.fill();
 
   ctx.fillStyle = "#172033";
-  ctx.font = "16px system-ui, sans-serif";
+  ctx.font = "16px Arial, sans-serif";
   ctx.fillText("mask + bbox + 2D/3D anchor", 24, 32);
-  ctx.fillStyle = "#5c687a";
+  ctx.fillStyle = "#5d6676";
   ctx.fillText(`anchor: [${Math.round(cx)}, ${Math.round(cy)}]  depth: ${(1.2 + Math.sin(t) * 0.2).toFixed(2)}m`, 24, h - 24);
 }
 
@@ -215,5 +300,24 @@ document.getElementById("toggleTracking")?.addEventListener("click", () => {
   }
 });
 
+function initFromHash() {
+  const hash = window.location.hash.replace("#", "");
+  const demoMatch = hash.match(/^demo-(.+)$/);
+  const noteMatch = hash.match(/^note-(.+)$/);
+
+  if (demoMatch && demos[demoMatch[1]]) {
+    setDemo(demoMatch[1], false, false);
+    return;
+  }
+
+  setDemo("qwen", false, false);
+
+  if (noteMatch && projectDetails[noteMatch[1]]) {
+    openProjectNote(noteMatch[1], false);
+  } else {
+    openProjectNote("qwen", false);
+  }
+}
+
 drawTracking(document.getElementById("trackingCanvas"), 0.4);
-setDemo("qwen", false);
+initFromHash();
