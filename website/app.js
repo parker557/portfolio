@@ -183,6 +183,8 @@ const projectDetails = {
 
 const demoOutput = document.getElementById("demoOutput");
 const demoButtons = document.querySelectorAll("[data-demo]");
+const filterButtons = document.querySelectorAll("[data-filter]");
+const projectCards = document.querySelectorAll(".project-card");
 const projectDetailTitle = document.getElementById("projectDetailTitle");
 const projectDetailBody = document.getElementById("projectDetailBody");
 
@@ -224,6 +226,22 @@ demoButtons.forEach((button) => {
 
 document.querySelectorAll("[data-project-open]").forEach((button) => {
   button.addEventListener("click", () => openProjectNote(button.dataset.projectOpen));
+});
+
+function setProjectFilter(filterName) {
+  filterButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.filter === filterName);
+  });
+
+  projectCards.forEach((card) => {
+    const categories = (card.dataset.category || "").split(/\s+/);
+    const shouldShow = filterName === "all" || categories.includes(filterName);
+    card.classList.toggle("is-hidden", !shouldShow);
+  });
+}
+
+filterButtons.forEach((button) => {
+  button.addEventListener("click", () => setProjectFilter(button.dataset.filter));
 });
 
 let trackingOn = false;
@@ -311,6 +329,7 @@ function initFromHash() {
   }
 
   setDemo("qwen", false, false);
+  setProjectFilter("all");
 
   if (noteMatch && projectDetails[noteMatch[1]]) {
     openProjectNote(noteMatch[1], false);

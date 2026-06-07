@@ -29,8 +29,8 @@
     <main id="top">
       <section class="hero section">
         <div class="hero-copy">
-          <p class="eyebrow">Model serving - multimodal AI - robotics prototypes</p>
-          <h1>I build AI demos with enough engineering around them to be tested, reused, and handed off.</h1>
+          <p class="eyebrow">Model serving, multimodal AI, robotics prototypes</p>
+          <h1>I build AI demos with the engineering needed to test, reuse, and hand them off.</h1>
           <p class="lead">
             My recent work is practical rather than research-only: Qwen-family VLM demos, FastAPI
             and vLLM model APIs, Qwen3-VL batch detection, RealSense + SAM 3 tracking, Jetson AGX
@@ -136,8 +136,16 @@
           </p>
         </div>
 
+        <div class="project-filter" role="group" aria-label="Filter projects">
+          <button class="active" data-filter="all" type="button">All</button>
+          <button data-filter="ai" type="button">AI and vision</button>
+          <button data-filter="robotics" type="button">Robotics</button>
+          <button data-filter="fullstack" type="button">Full-stack</button>
+          <button data-filter="systems" type="button">Systems</button>
+        </div>
+
         <div class="project-grid">
-          <article class="project-card" data-project="qwen">
+          <article class="project-card" data-project="qwen" data-category="ai vision">
             <img src="./assets/qwen-result.jpg" alt="Qwen3-VL detection output with bounding boxes" />
             <div class="project-body">
               <p class="tag">GenAI + computer vision</p>
@@ -164,7 +172,7 @@
             </div>
           </article>
 
-          <article class="project-card" data-project="property">
+          <article class="project-card" data-project="property" data-category="ai fullstack">
             <div class="diagram property-diagram" aria-hidden="true">
               <span>Owner</span>
               <span>Issue</span>
@@ -196,7 +204,7 @@
             </div>
           </article>
 
-          <article class="project-card" data-project="tracking">
+          <article class="project-card" data-project="tracking" data-category="ai robotics vision">
             <canvas class="tracking-canvas" id="trackingCanvas" width="560" height="280" aria-label="Animated object tracking demo"></canvas>
             <div class="project-body">
               <p class="tag">Robotics perception</p>
@@ -223,7 +231,7 @@
             </div>
           </article>
 
-          <article class="project-card" data-project="chat">
+          <article class="project-card" data-project="chat" data-category="systems fullstack">
             <div class="diagram security-diagram" aria-hidden="true">
               <span>TLS</span>
               <span>OTP</span>
@@ -255,7 +263,7 @@
             </div>
           </article>
 
-          <article class="project-card" data-project="rentconnect">
+          <article class="project-card" data-project="rentconnect" data-category="fullstack">
             <img src="./assets/rentconnect-showcase.png" alt="RentConnect real estate app showcase" />
             <div class="project-body">
               <p class="tag">React + Firebase</p>
@@ -282,7 +290,7 @@
             </div>
           </article>
 
-          <article class="project-card" data-project="finance">
+          <article class="project-card" data-project="finance" data-category="ai">
             <div class="diagram finance-diagram" aria-hidden="true">
               <span>Input</span>
               <span>LLM</span>
