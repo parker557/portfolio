@@ -146,7 +146,7 @@ function buildDashScopePayload({ model, prompt, referenceImage, searchImage }) {
       {
         role: "system",
         content:
-          "You are a vision-language object detection assistant. Return compact JSON only, with a results array. Each result should include label, confidence if available, and bbox_2d as [x1, y1, x2, y2] pixel coordinates."
+          "You are a vision-language object detection assistant. Return compact JSON only, with no Markdown fences. The top-level object must have a results array. Each result must include label, confidence if available, and bbox_2d as a JSON array [x1, y1, x2, y2] in pixel coordinates."
       },
       {
         role: "user",
@@ -157,7 +157,7 @@ function buildDashScopePayload({ model, prompt, referenceImage, searchImage }) {
           { type: "image_url", image_url: { url: searchImage } },
           {
             type: "text",
-            text: `${userPrompt}\n\nReturn JSON only. Example: {"results":[{"label":"target_object","confidence":0.82,"bbox_2d":[10,20,100,180]}]}`
+            text: `${userPrompt}\n\nReturn valid JSON only. Do not use Markdown. Do not omit square brackets around bbox_2d. Example: {"results":[{"label":"target_object","confidence":0.82,"bbox_2d":[10,20,100,180]}]}`
           }
         ]
       }
@@ -229,5 +229,26 @@ function extractJson(content) {
   const last = cleaned.lastIndexOf("}");
 
   if (first === -1 || last === -1 || last <= first) return null;
-  return safeJsonParse(cleaned.slice(first, last + 1));
+  const parsed = safeJsonParse(cleaned.slice(first, last + 1));
+  if (parsed) return parsed;
+
+  return extractLooseDetections(cleaned);
+}
+
+function extractLooseDetections(text) {
+  const results = [];
+  const pattern =
+    /"label"\s*:\s*"([^"]+)"[\s\S]*?"confidence"\s*:\s*([0-9.]+)[\s\S]*?"bbox_2d"\s*:\s*\[?\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/g;
+  let match;
+
+  while ((match = pattern.exec(text))) {
+    results.push({
+      label: match[1],
+      confidence: Number(match[2]),
+      bbox_2d: match.slice(3, 7).map(Number)
+    });
+  }
+
+  if (results.length > 0) return { results };
+  return null;
 }

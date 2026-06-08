@@ -25,15 +25,13 @@ const demos = {
     title: "Property management agent workflow",
     body: `
       <div class="demo-layout">
-        <ol class="step-list">
-          <li><strong>Owner report</strong><br>Tenant reports a leaking pipe with priority and unit details.</li>
-          <li><strong>Server route</strong><br>Express stores the issue and opens a Socket.IO update path.</li>
-          <li><strong>AI draft</strong><br>OpenAI-compatible request drafts a staff-facing response.</li>
-          <li><strong>Staff action</strong><br>Staff dashboard receives the issue, chat thread, and suggested next step.</li>
-        </ol>
+        <figure class="demo-capture">
+          <img src="./assets/project-captures/property-staff-dashboard.png" alt="Property Management System staff dashboard screenshot">
+          <figcaption>Staff dashboard after local login test</figcaption>
+        </figure>
         <div>
           <h3>What this shows</h3>
-          <p>Full-stack flow, session login, dashboards, chat, and an AI-assist path that can be inspected rather than treated as a black box.</p>
+          <p>Full-stack flow, session login, owner/staff dashboards, chat, and an AI-assist route that can be inspected instead of treated as a black box.</p>
           <div class="metrics">
             <div><strong>2</strong><span>dashboards</span></div>
             <div><strong>3</strong><span>user roles tested</span></div>
@@ -81,12 +79,13 @@ docker-compose services: webapp, db, nginx</code></pre>
     title: "RentConnect secure SaaS flow",
     body: `
       <div class="demo-layout">
-        <figure class="demo-images">
-          <img src="./assets/rentconnect-showcase.png" alt="RentConnect showcase screen">
+        <figure class="demo-capture">
+          <img src="./assets/project-captures/rentconnect-home.png" alt="RentConnect running React homepage">
+          <figcaption>React app running locally on port 3001</figcaption>
         </figure>
         <div>
           <h3>React and Firebase app structure</h3>
-          <p>The project combines authentication, Firestore-backed data, Material UI components, Redux state, and payment integration wiring for a real-estate workflow.</p>
+          <p>The project combines authentication, Firestore-backed data, Material UI components, Redux state, and payment integration wiring for a real-estate SaaS workflow.</p>
           <div class="metrics">
             <div><strong>React</strong><span>frontend</span></div>
             <div><strong>Firebase</strong><span>auth/data</span></div>
@@ -100,11 +99,10 @@ docker-compose services: webapp, db, nginx</code></pre>
     title: "AI report workflow",
     body: `
       <div class="demo-layout">
-        <ol class="step-list">
-          <li><strong>Local input</strong><br>Read configuration, history, and user-provided financial context.</li>
-          <li><strong>LLM call</strong><br>Call a model API to generate a structured Markdown report.</li>
-          <li><strong>Review step</strong><br>Keep the workflow local and treat output as a draft, not financial advice.</li>
-        </ol>
+        <figure class="demo-capture">
+          <img src="./assets/project-captures/finance-terminal.png" alt="AI Finance Advisor terminal workflow screenshot">
+          <figcaption>Terminal-style evidence for local report workflow</figcaption>
+        </figure>
         <pre class="demo-log"><code># Report skeleton
 - context summary
 - risk notes
@@ -131,9 +129,9 @@ const projectDetails = {
     title: "Property Management System",
     body: `
       <ul>
-        <li>This project is a practical full-stack workflow: report, store, notify, draft, respond.</li>
-        <li>The AI path is intentionally visible rather than hidden behind a magic button, which makes debugging easier.</li>
-        <li>Next improvement: add better audit logs and role-based permissions around issue changes.</li>
+        <li>I started the Express server locally and tested owner/staff login paths before adding screenshots to this site.</li>
+        <li>The project has session-backed dashboards, repair requests, notices, Socket.IO chat, and an OpenAI-compatible AI response route.</li>
+        <li>Next improvement: replace mock data with a small database and add audit logs around issue changes.</li>
       </ul>
     `
   },
@@ -151,9 +149,9 @@ const projectDetails = {
     title: "E2EE Chat Network Application",
     body: `
       <ul>
-        <li>The project helped me practice deployment-level thinking: TLS, Docker Compose, database setup, and authentication flow.</li>
-        <li>I treated the security pieces as parts of a system instead of isolated checkboxes.</li>
-        <li>Next improvement: add clearer threat-model notes and automated setup checks.</li>
+        <li>The project uses Docker Compose with Nginx, Flask, MySQL, TLS certificate files, init SQL, and OTP setup assets.</li>
+        <li>I kept the video demo on the site because this project depends on local certificate/host setup and is not a simple static preview.</li>
+        <li>Next improvement: add a clean threat-model note and a one-command health check for the service stack.</li>
       </ul>
     `
   },
@@ -161,9 +159,9 @@ const projectDetails = {
     title: "RentConnect Secure SaaS Platform",
     body: `
       <ul>
-        <li>This is the frontend-heavy project I use to show React, Firebase, app structure, state, and UI workflows.</li>
-        <li>The interesting part is connecting authentication, Firestore data, listing UI, and payment-provider wiring.</li>
-        <li>Next improvement: tighten the README with screenshots for each role and setup path.</li>
+        <li>I installed the React dependencies with legacy peer handling and restored a missing image asset so the app could compile for screenshots.</li>
+        <li>The useful part is the web app structure: React routes, Firebase config, Material UI, listing/search UI, and payment wiring.</li>
+        <li>Next improvement: modernize old CRA dependencies and clean up ESLint warnings before treating it as production-ready.</li>
       </ul>
     `
   },
@@ -172,8 +170,8 @@ const projectDetails = {
     body: `
       <ul>
         <li>This is a local AI workflow experiment, not a product and not financial advice.</li>
-        <li>I used it to practice structured prompts, local files, repeatable Markdown output, and review-first AI writing.</li>
-        <li>Next improvement: separate data loading, model call, and report rendering into testable modules.</li>
+        <li>The project stores configuration and history locally, calls an LLM when an API key is configured, and writes Markdown reports.</li>
+        <li>Next improvement: separate data loading, model call, and report rendering into testable modules with safer sample data.</li>
       </ul>
     `
   }

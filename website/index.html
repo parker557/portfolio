@@ -151,6 +151,48 @@
         </article>
       </section>
 
+      <section class="section run-evidence" aria-labelledby="evidence-title">
+        <div class="section-heading">
+          <p class="eyebrow">Run evidence</p>
+          <h2 id="evidence-title">Screenshots from projects I actually started and inspected locally.</h2>
+          <p>
+            I added this section because portfolio pages work better when they show real windows,
+            dashboards, terminal output, and constraints. Some older projects run cleanly; some need
+            dependency fixes or external services, which I note directly instead of hiding it.
+          </p>
+        </div>
+        <div class="capture-grid">
+          <figure class="capture-card large">
+            <img src="./assets/project-captures/property-owner-dashboard.png" alt="Property Management System owner dashboard running locally" />
+            <figcaption>
+              <strong>Property Management System</strong>
+              <span>Express app running on localhost, owner login tested with session-backed dashboard.</span>
+            </figcaption>
+          </figure>
+          <figure class="capture-card">
+            <img src="./assets/project-captures/rentconnect-home.png" alt="RentConnect React application running locally" />
+            <figcaption>
+              <strong>RentConnect</strong>
+              <span>React app compiled after restoring a missing image asset; shown with real local page output.</span>
+            </figcaption>
+          </figure>
+          <figure class="capture-card">
+            <img src="./assets/project-captures/e2ee-terminal.png" alt="E2EE Chat Docker Compose service layout terminal evidence" />
+            <figcaption>
+              <strong>E2EE Chat</strong>
+              <span>Docker/Nginx/MySQL/Flask deployment shape, with video evidence in the demo panel.</span>
+            </figcaption>
+          </figure>
+          <figure class="capture-card">
+            <img src="./assets/project-captures/finance-terminal.png" alt="AI Finance Advisor local report workflow terminal evidence" />
+            <figcaption>
+              <strong>AI Finance Advisor</strong>
+              <span>Local report-generation workflow shown as a review-first AI draft system.</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
       <section class="section" id="lab" aria-labelledby="lab-title">
         <div class="section-heading">
           <p class="eyebrow">Robotics AI Demo Lab</p>
@@ -276,12 +318,7 @@
           </article>
 
           <article class="project-card" data-project="property" data-category="ai fullstack">
-            <div class="diagram property-diagram" aria-hidden="true">
-              <span>Owner</span>
-              <span>Issue</span>
-              <span>AI draft</span>
-              <span>Staff</span>
-            </div>
+            <img src="./assets/project-captures/property-owner-dashboard.png" alt="Property Management System owner dashboard screenshot" />
             <div class="project-body">
               <p class="tag">Full-stack AI app</p>
               <h3>Property Management System</h3>
@@ -335,12 +372,7 @@
           </article>
 
           <article class="project-card" data-project="chat" data-category="systems fullstack">
-            <div class="diagram security-diagram" aria-hidden="true">
-              <span>TLS</span>
-              <span>OTP</span>
-              <span>E2EE</span>
-              <span>Docker</span>
-            </div>
+            <img src="./assets/project-captures/e2ee-terminal.png" alt="E2EE Chat Docker Compose terminal evidence" />
             <div class="project-body">
               <p class="tag">Security + web</p>
               <h3>E2EE Chat Network Application</h3>
@@ -367,7 +399,7 @@
           </article>
 
           <article class="project-card" data-project="rentconnect" data-category="fullstack">
-            <img src="./assets/rentconnect-showcase.png" alt="RentConnect real estate app showcase" />
+            <img src="./assets/project-captures/rentconnect-home.png" alt="RentConnect local React app screenshot" />
             <div class="project-body">
               <p class="tag">React + Firebase</p>
               <h3>RentConnect Secure SaaS Platform</h3>
@@ -394,12 +426,7 @@
           </article>
 
           <article class="project-card" data-project="finance" data-category="ai">
-            <div class="diagram finance-diagram" aria-hidden="true">
-              <span>Input</span>
-              <span>LLM</span>
-              <span>Report</span>
-              <span>Review</span>
-            </div>
+            <img src="./assets/project-captures/finance-terminal.png" alt="AI Finance Advisor terminal workflow evidence" />
             <div class="project-body">
               <p class="tag">AI workflow</p>
               <h3>AI Finance Advisor</h3>
