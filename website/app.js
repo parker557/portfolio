@@ -66,12 +66,10 @@ const demos = {
     title: "Secure chat design",
     body: `
       <div class="demo-layout">
-        <ol class="step-list">
-          <li><strong>Login</strong><br>Flask route validates user credentials and session state.</li>
-          <li><strong>MFA</strong><br>OTP flow adds a second check before sensitive chat access.</li>
-          <li><strong>TLS</strong><br>Nginx and certificates protect the deployed transport layer.</li>
-          <li><strong>E2EE design</strong><br>Messages follow an encryption-first design with database-backed delivery.</li>
-        </ol>
+        <div>
+          <video class="demo-video" src="./assets/e2ee-chat-demo.mp4" controls playsinline preload="metadata"></video>
+          <p class="video-caption">Compressed project clip from the E2EE Chat Network Application demo.</p>
+        </div>
         <pre class="demo-log"><code>client -> TLS -> Flask app -> MySQL
 OTP verified: true
 message status: encrypted payload queued
@@ -181,12 +179,83 @@ const projectDetails = {
   }
 };
 
+const qwenLabSamples = {
+  test1: {
+    ref: "./assets/qwen-test1-ref.jpg",
+    search: "./assets/qwen-test1-search.jpg",
+    result: "./assets/qwen-test1-result.jpg",
+    count: 3,
+    avgTime: "7-8s",
+    json: {
+      results: [
+        {
+          label: "target_object",
+          bbox_qwen1000: [148.0, 110.0, 510.0, 420.0],
+          bbox_2d: [166, 99, 573, 379]
+        },
+        {
+          label: "target_object",
+          bbox_qwen1000: [185.0, 470.0, 500.0, 830.0],
+          bbox_2d: [208, 424, 562, 749]
+        },
+        {
+          label: "target_object",
+          bbox_qwen1000: [510.0, 360.0, 900.0, 650.0],
+          bbox_2d: [573, 325, 1011, 587]
+        }
+      ]
+    }
+  },
+  test2: {
+    ref: "./assets/qwen-test2-ref.png",
+    search: "./assets/qwen-test2-search.jpg",
+    result: "./assets/qwen-test2-result.jpg",
+    count: 4,
+    avgTime: "9.5s",
+    json: {
+      results: [
+        {
+          label: "target_object",
+          bbox_qwen1000: [30.0, 250.0, 350.0, 880.0],
+          bbox_2d: [35, 184, 406, 649]
+        },
+        {
+          label: "target_object",
+          bbox_qwen1000: [280.0, 250.0, 500.0, 880.0],
+          bbox_2d: [325, 184, 580, 649]
+        },
+        {
+          label: "target_object",
+          bbox_qwen1000: [480.0, 250.0, 780.0, 880.0],
+          bbox_2d: [556, 184, 904, 649]
+        },
+        {
+          label: "target_object",
+          bbox_qwen1000: [780.0, 250.0, 990.0, 880.0],
+          bbox_2d: [904, 184, 1147, 649]
+        }
+      ]
+    }
+  }
+};
+
 const demoOutput = document.getElementById("demoOutput");
 const demoButtons = document.querySelectorAll("[data-demo]");
 const filterButtons = document.querySelectorAll("[data-filter]");
 const projectCards = document.querySelectorAll(".project-card");
 const projectDetailTitle = document.getElementById("projectDetailTitle");
 const projectDetailBody = document.getElementById("projectDetailBody");
+const sampleSelect = document.getElementById("sampleSelect");
+const refUpload = document.getElementById("refUpload");
+const searchUpload = document.getElementById("searchUpload");
+const labPrompt = document.getElementById("labPrompt");
+const labRefImage = document.getElementById("labRefImage");
+const labSearchImage = document.getElementById("labSearchImage");
+const labResultImage = document.getElementById("labResultImage");
+const labJsonOutput = document.getElementById("labJsonOutput");
+const labDetectionCount = document.getElementById("labDetectionCount");
+const labAvgTime = document.getElementById("labAvgTime");
+const liveStatus = document.getElementById("liveStatus");
 
 function setDemo(name, shouldScroll = true, shouldUpdateHash = true) {
   const demo = demos[name] || demos.qwen;
@@ -242,6 +311,75 @@ function setProjectFilter(filterName) {
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => setProjectFilter(button.dataset.filter));
+});
+
+function setLabSample(name) {
+  const sample = qwenLabSamples[name] || qwenLabSamples.test1;
+  labRefImage.src = sample.ref;
+  labSearchImage.src = sample.search;
+  labResultImage.src = sample.result;
+  labDetectionCount.textContent = sample.count;
+  labAvgTime.textContent = sample.avgTime;
+  labJsonOutput.textContent = JSON.stringify(sample.json, null, 2);
+  liveStatus.textContent = "recorded replay loaded";
+}
+
+function previewUpload(input, targetImage, fallbackResult = false) {
+  const file = input.files?.[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  targetImage.src = url;
+  if (fallbackResult) labResultImage.src = url;
+  labDetectionCount.textContent = "preview";
+  labAvgTime.textContent = "not run";
+  labJsonOutput.textContent = JSON.stringify(
+    {
+      status: "custom image preview only",
+      next_step: "connect a live VLM endpoint to run inference on uploaded images"
+    },
+    null,
+    2
+  );
+  liveStatus.textContent = "custom images loaded; inference not run";
+}
+
+sampleSelect?.addEventListener("change", () => setLabSample(sampleSelect.value));
+
+document.getElementById("runRecordedDemo")?.addEventListener("click", () => {
+  setLabSample(sampleSelect?.value || "test1");
+});
+
+refUpload?.addEventListener("change", () => previewUpload(refUpload, labRefImage));
+searchUpload?.addEventListener("change", () => previewUpload(searchUpload, labSearchImage, true));
+
+document.getElementById("tryLiveInference")?.addEventListener("click", async () => {
+  liveStatus.textContent = "checking endpoint...";
+  const formData = new FormData();
+  formData.append("sample", sampleSelect?.value || "test1");
+  formData.append("prompt", labPrompt?.value || "");
+  if (refUpload?.files?.[0]) formData.append("reference", refUpload.files[0]);
+  if (searchUpload?.files?.[0]) formData.append("search", searchUpload.files[0]);
+
+  try {
+    const response = await fetch("/api/qwen-detect", {
+      method: "POST",
+      body: formData
+    });
+    const payload = await response.json();
+    liveStatus.textContent = payload.status || "endpoint returned a response";
+    labJsonOutput.textContent = JSON.stringify(payload, null, 2);
+  } catch (error) {
+    liveStatus.textContent = "endpoint not available on local static preview";
+    labJsonOutput.textContent = JSON.stringify(
+      {
+        status: "live endpoint unavailable",
+        message: "Deploy the Cloudflare Pages Function and add a model API key or vLLM endpoint.",
+        error: error.message
+      },
+      null,
+      2
+    );
+  }
 });
 
 let trackingOn = false;
@@ -330,6 +468,7 @@ function initFromHash() {
 
   setDemo("qwen", false, false);
   setProjectFilter("all");
+  setLabSample("test1");
 
   if (noteMatch && projectDetails[noteMatch[1]]) {
     openProjectNote(noteMatch[1], false);

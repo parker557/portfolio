@@ -8,6 +8,8 @@ Static personal website for Cloudflare Pages.
 - Avoid generic AI-style copy: use concrete project context, short sentences, and honest "next improvement" notes.
 - Keep it static and deployable on Cloudflare Pages. No API keys, no live model calls, and no backend dependency.
 - Demo buttons are client-side previews only. They are meant to show workflow shape, not production inference.
+- The Demo Lab includes recorded Qwen3-VL runs and a `/api/qwen-detect` Function stub for future live inference.
+- True upload-and-infer needs a provider key or a deployed OpenAI-compatible VLM endpoint configured as Cloudflare Pages secrets.
 
 ## Local Preview
 

@@ -18,6 +18,7 @@
       </a>
       <nav aria-label="Primary navigation">
         <a href="#projects">Projects</a>
+        <a href="#lab">Demo Lab</a>
         <a href="#demos">Demos</a>
         <a href="#notes">Notes</a>
         <a href="#experience">Experience</a>
@@ -39,6 +40,7 @@
 
           <div class="hero-actions">
             <a class="button primary" href="#projects">Review project notes</a>
+            <a class="button secondary" href="#lab">Try demo lab</a>
             <a class="button secondary" href="./assets/Zheng_Jiang_Resume.pdf">Download resume</a>
             <a class="button secondary" href="https://github.com/parker557/portfolio">GitHub portfolio</a>
           </div>
@@ -86,6 +88,29 @@
         </aside>
       </section>
 
+      <section class="section brain-strip" aria-label="Robotics AI workflow">
+        <article>
+          <span>01</span>
+          <h2>Perception</h2>
+          <p>VLM inputs, RealSense color/depth streams, masks, boxes, and object-state output.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h2>Reasoning</h2>
+          <p>Prompt design, JSON parsing, RAG/LoRA experiments, and model API workflows.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h2>Control Handoff</h2>
+          <p>2D/3D anchors, pose hints, logs, CSV summaries, and notes another engineer can inspect.</p>
+        </article>
+        <article>
+          <span>04</span>
+          <h2>Edge Testing</h2>
+          <p>Jetson AGX Orin, JetPack 6.2, RK3588/RKNN, Docker/Linux, and deployment checks.</p>
+        </article>
+      </section>
+
       <section class="section compact" aria-labelledby="stack-title">
         <div class="section-heading tight">
           <p class="eyebrow">Working stack</p>
@@ -124,6 +149,84 @@
           <span class="number">1</span>
           <p>static Cloudflare Pages site, no embedded API keys, resume included</p>
         </article>
+      </section>
+
+      <section class="section" id="lab" aria-labelledby="lab-title">
+        <div class="section-heading">
+          <p class="eyebrow">Robotics AI Demo Lab</p>
+          <h2 id="lab-title">Replay a real Qwen3-VL run, then try your own prompt and images.</h2>
+          <p>
+            The recorded samples below use real files from my Qwen3-VL DuoImage Detector project.
+            Uploading new images works for preview now. True live inference needs a model API key
+            or a deployed OpenAI-compatible Qwen/VLM endpoint.
+          </p>
+        </div>
+
+        <div class="lab-shell">
+          <div class="lab-controls">
+            <div class="control-row">
+              <label for="sampleSelect">Recorded sample</label>
+              <select id="sampleSelect">
+                <option value="test1">Mouse objects, 3 detections</option>
+                <option value="test2">Standee objects, 4 detections</option>
+              </select>
+            </div>
+            <div class="upload-grid">
+              <label class="upload-box">
+                <span>Reference image</span>
+                <input id="refUpload" type="file" accept="image/*" />
+              </label>
+              <label class="upload-box">
+                <span>Search image</span>
+                <input id="searchUpload" type="file" accept="image/*" />
+              </label>
+            </div>
+            <label class="prompt-box" for="labPrompt">
+              <span>Prompt</span>
+              <textarea id="labPrompt" rows="7">Based on the two images above. The first image shows a target object. The second image contains multiple target objects. Find all objects of the same type in the second image and return JSON bounding boxes only.</textarea>
+            </label>
+            <div class="hero-actions">
+              <button class="button primary" id="runRecordedDemo" type="button">Run recorded replay</button>
+              <button class="button secondary" id="tryLiveInference" type="button">Try live endpoint</button>
+            </div>
+            <p class="lab-note">
+              Live endpoint status: <strong id="liveStatus">not configured yet</strong>. To enable it,
+              configure a Cloudflare Pages Function with a Qwen/VLM API key or your own vLLM endpoint.
+            </p>
+          </div>
+
+          <div class="lab-output">
+            <div class="lab-images">
+              <figure>
+                <img id="labRefImage" src="./assets/qwen-test1-ref.jpg" alt="Recorded reference input" />
+                <figcaption>Reference</figcaption>
+              </figure>
+              <figure>
+                <img id="labSearchImage" src="./assets/qwen-test1-search.jpg" alt="Recorded search input" />
+                <figcaption>Search image</figcaption>
+              </figure>
+              <figure>
+                <img id="labResultImage" src="./assets/qwen-test1-result.jpg" alt="Recorded Qwen3-VL result" />
+                <figcaption>Recorded result</figcaption>
+              </figure>
+            </div>
+            <div class="lab-result-meta">
+              <div>
+                <strong id="labDetectionCount">3</strong>
+                <span>detections</span>
+              </div>
+              <div>
+                <strong id="labAvgTime">7-8s</strong>
+                <span>recorded run time</span>
+              </div>
+              <div>
+                <strong>JSON</strong>
+                <span>bbox output</span>
+              </div>
+            </div>
+            <pre class="demo-log"><code id="labJsonOutput"></code></pre>
+          </div>
+        </div>
       </section>
 
       <section class="section" id="projects" aria-labelledby="projects-title">
