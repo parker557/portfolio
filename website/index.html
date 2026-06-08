@@ -14,13 +14,13 @@
     <header class="site-header">
       <a class="brand" href="#top" aria-label="Zheng Jiang portfolio home">
         <span>Zheng (John) Jiang</span>
-        <small>AI Developer</small>
+        <small>AI apps and robotics demos</small>
       </a>
       <nav aria-label="Primary navigation">
-        <a href="#projects">Projects</a>
-        <a href="#lab">Demo Lab</a>
-        <a href="#demos">Demos</a>
-        <a href="#notes">Notes</a>
+        <a href="#lab">Lab</a>
+        <a href="#projects">Work</a>
+        <a href="#demos">Preview</a>
+        <a href="#notes">Process</a>
         <a href="#experience">Experience</a>
         <a href="#contact">Contact</a>
         <a class="nav-resume" href="./assets/Zheng_Jiang_Resume.pdf">Resume</a>
@@ -30,19 +30,19 @@
     <main id="top">
       <section class="hero section">
         <div class="hero-copy">
-          <p class="eyebrow">Model serving, multimodal AI, robotics prototypes</p>
-          <h1>I build AI demos with the engineering needed to test, reuse, and hand them off.</h1>
+          <p class="eyebrow">Field notes from AI application work</p>
+          <h1>AI demos that run, leave logs, and can be checked by another engineer.</h1>
           <p class="lead">
-            My recent work is practical rather than research-only: Qwen-family VLM demos, FastAPI
-            and vLLM model APIs, Qwen3-VL batch detection, RealSense + SAM 3 tracking, Jetson AGX
-            Orin tests, RAG/LoRA experiments, and full-stack prototypes with clear run notes.
+            I work close to the messy edge of applied AI: Qwen-family VLM demos, FastAPI and vLLM
+            model APIs, Qwen3-VL batch detection, RealSense + SAM 3 tracking, Jetson AGX Orin tests,
+            RAG/LoRA experiments, and web prototypes with enough notes to reproduce the result.
           </p>
 
           <div class="hero-actions">
-            <a class="button primary" href="#projects">Review project notes</a>
-            <a class="button secondary" href="#lab">Try demo lab</a>
-            <a class="button secondary" href="./assets/Zheng_Jiang_Resume.pdf">Download resume</a>
-            <a class="button secondary" href="https://github.com/parker557/portfolio">GitHub portfolio</a>
+            <a class="button primary" href="#lab">Open demo lab</a>
+            <a class="button secondary" href="#projects">Read project notes</a>
+            <a class="button secondary" href="https://github.com/parker557/portfolio">GitHub</a>
+            <a class="button secondary" href="./assets/Zheng_Jiang_Resume.pdf">Resume</a>
           </div>
 
           <dl class="quick-facts" aria-label="Profile quick facts">
@@ -62,8 +62,12 @@
         </div>
 
         <aside class="build-panel" aria-label="Current portfolio highlight">
+          <div class="status-strip" aria-label="Site status">
+            <span>Live endpoint</span>
+            <strong>DashScope Qwen3-VL online</strong>
+          </div>
           <div class="panel-topline">
-            <span>Latest build note</span>
+            <span>Current build note</span>
             <strong>Qwen3-VL DuoImage Detector</strong>
           </div>
           <div class="mini-gallery">
@@ -85,6 +89,16 @@
             <p><strong>Built:</strong> pairing, prompt construction, JSON parsing, coordinate conversion, CSV/XLSX summaries, and rendered boxes.</p>
             <p><strong>Why it matters:</strong> the output can be checked visually and by file, which makes the demo easier to debug and hand off.</p>
           </div>
+          <dl class="build-meta" aria-label="Build metadata">
+            <div>
+              <dt>Stack</dt>
+              <dd>Python, Qwen VLM, Cloudflare Pages Function</dd>
+            </div>
+            <div>
+              <dt>Site style</dt>
+              <dd>Real screenshots, short notes, no stock art</dd>
+            </div>
+          </dl>
         </aside>
       </section>
 
@@ -154,11 +168,11 @@
       <section class="section run-evidence" aria-labelledby="evidence-title">
         <div class="section-heading">
           <p class="eyebrow">Run evidence</p>
-          <h2 id="evidence-title">Screenshots from projects I actually started and inspected locally.</h2>
+          <h2 id="evidence-title">Screenshots from projects I started and inspected locally.</h2>
           <p>
-            I added this section because portfolio pages work better when they show real windows,
-            dashboards, terminal output, and constraints. Some older projects run cleanly; some need
-            dependency fixes or external services, which I note directly instead of hiding it.
+            I keep the evidence visible because it is more useful than a polished claim. Some older
+            projects run cleanly; some need dependency fixes or external services, which I note
+            directly instead of hiding it.
           </p>
         </div>
         <div class="capture-grid">

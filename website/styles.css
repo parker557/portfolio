@@ -1,21 +1,22 @@
 :root {
-  --bg: #eef3f3;
-  --paper: #fffdf8;
+  --bg: #edf1ee;
+  --paper: #fffdf7;
   --surface: #ffffff;
-  --ink: #172033;
-  --muted: #5d6676;
+  --ink: #18202d;
+  --muted: #5a6370;
   --soft: #e9f0ec;
-  --line: #d8ddcf;
-  --line-strong: #bcc7b5;
-  --teal: #166f6a;
+  --line: #d7ddd4;
+  --line-strong: #b9c5ba;
+  --teal: #176a61;
   --blue: #2f5f98;
   --amber: #a86620;
   --plum: #6a4c7c;
   --green: #347a55;
-  --navy: #10233a;
+  --navy: #111f2e;
   --cyan: #69c6d5;
   --code: #111827;
-  --shadow: 0 18px 42px rgba(28, 39, 52, 0.09);
+  --shadow: 0 14px 32px rgba(24, 32, 45, 0.075);
+  --shadow-light: 0 8px 18px rgba(24, 32, 45, 0.045);
 }
 
 * {
@@ -30,11 +31,11 @@ html {
 body {
   margin: 0;
   background:
-    linear-gradient(180deg, rgba(16, 35, 58, 1) 0, rgba(18, 54, 70, 0.98) 1120px, rgba(238, 243, 243, 1) 1121px),
-    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(17, 31, 46, 1) 0, rgba(18, 48, 56, 0.98) 960px, rgba(237, 241, 238, 1) 961px),
+    linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     var(--bg);
-  background-size: auto, 34px 34px, 34px 34px;
+  background-size: auto, 32px 32px, 32px 32px;
   color: var(--ink);
   font-family: Arial, Helvetica, sans-serif;
   line-height: 1.48;
@@ -81,10 +82,10 @@ a:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 22px;
-  padding: 13px max(22px, calc((100vw - 1180px) / 2));
+  padding: 12px max(22px, calc((100vw - 1180px) / 2));
   border-bottom: 1px solid rgba(210, 228, 233, 0.18);
-  background: rgba(13, 29, 48, 0.9);
-  backdrop-filter: blur(12px);
+  background: rgba(13, 25, 38, 0.92);
+  backdrop-filter: blur(10px);
   color: #f8fbff;
 }
 
@@ -105,9 +106,9 @@ nav {
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 11px;
   color: rgba(226, 237, 242, 0.72);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
 }
 
 nav a:hover {
@@ -126,7 +127,7 @@ nav a:hover {
   width: 100%;
   max-width: 1220px;
   margin: 0 auto;
-  padding: 58px 20px;
+  padding: 54px 20px;
 }
 
 .section.compact {
@@ -141,11 +142,11 @@ nav a:hover {
 .hero {
   position: relative;
   display: grid;
-  min-height: calc(88vh - 72px);
-  grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1fr);
+  min-height: calc(78vh - 70px);
+  grid-template-columns: minmax(0, 0.96fr) minmax(360px, 0.92fr);
   align-items: center;
-  gap: 34px;
-  padding-top: 42px;
+  gap: 40px;
+  padding-top: 36px;
   color: #f8fbff;
 }
 
@@ -161,10 +162,10 @@ nav a:hover {
 }
 
 .hero h1 {
-  max-width: 820px;
+  max-width: 760px;
   margin: 0 0 18px;
-  font-size: clamp(2.18rem, 4.2vw, 4.25rem);
-  line-height: 1.03;
+  font-size: clamp(2.18rem, 4vw, 3.78rem);
+  line-height: 1.04;
   letter-spacing: 0;
 }
 
@@ -193,7 +194,7 @@ nav a:hover {
 }
 
 .hero-actions {
-  margin-top: 24px;
+  margin-top: 22px;
 }
 
 .button {
@@ -202,7 +203,7 @@ nav a:hover {
   align-items: center;
   justify-content: center;
   padding: 0 15px;
-  font-weight: 720;
+  font-weight: 700;
   transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
 }
 
@@ -249,15 +250,15 @@ nav a:hover {
 .quick-facts {
   display: grid;
   gap: 12px;
-  margin: 28px 0 0;
+  margin: 24px 0 0;
 }
 
 .quick-facts div {
   display: grid;
   grid-template-columns: 96px 1fr;
   gap: 14px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
+  padding-top: 11px;
+  border-top: 1px solid rgba(216, 221, 207, 0.32);
 }
 
 .quick-facts dt {
@@ -288,7 +289,38 @@ nav a:hover {
 .build-panel {
   border-color: rgba(210, 228, 233, 0.24);
   background: rgba(250, 253, 250, 0.96);
-  padding: 18px;
+  padding: 16px;
+  transform: translateY(18px);
+}
+
+.status-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -4px 0 14px;
+  border: 1px solid rgba(22, 111, 106, 0.22);
+  border-radius: 8px;
+  background: #e9f6f2;
+  color: #28524f;
+  padding: 9px 10px;
+  font-size: 0.86rem;
+}
+
+.status-strip strong {
+  position: relative;
+  color: #0e5c58;
+  font-size: 0.88rem;
+}
+
+.status-strip strong::before {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: #2f9f66;
+  content: "";
 }
 
 .panel-topline {
@@ -340,6 +372,38 @@ nav a:hover {
   padding: 12px 13px;
 }
 
+.build-meta {
+  display: grid;
+  gap: 0;
+  margin: 14px 0 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.build-meta div {
+  display: grid;
+  grid-template-columns: 86px 1fr;
+  gap: 12px;
+  padding: 10px 11px;
+}
+
+.build-meta div + div {
+  border-top: 1px solid var(--line);
+}
+
+.build-meta dt {
+  color: var(--ink);
+  font-size: 0.83rem;
+  font-weight: 760;
+}
+
+.build-meta dd {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .build-log p {
   margin: 0;
   color: var(--muted);
@@ -383,7 +447,8 @@ nav a:hover {
 .brain-strip article {
   position: relative;
   overflow: hidden;
-  padding: 18px;
+  padding: 16px;
+  box-shadow: var(--shadow-light);
 }
 
 .brain-strip article::before {
@@ -430,7 +495,7 @@ nav a:hover {
 
 .skill-row span {
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 7px;
   background: rgba(255, 253, 247, 0.92);
   color: #344155;
   padding: 7px 11px;
@@ -482,7 +547,7 @@ nav a:hover {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
-  box-shadow: 0 14px 36px rgba(28, 39, 52, 0.08);
+  box-shadow: var(--shadow-light);
 }
 
 .capture-card.large {
@@ -686,7 +751,7 @@ nav a:hover {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
-  box-shadow: 0 8px 22px rgba(28, 39, 52, 0.045);
+  box-shadow: var(--shadow-light);
 }
 
 .project-card::before {
@@ -1073,6 +1138,15 @@ nav a:hover {
 }
 
 @media (max-width: 720px) {
+  body {
+    background:
+      linear-gradient(180deg, rgba(17, 31, 46, 1) 0, rgba(18, 48, 56, 0.98) 1320px, rgba(237, 241, 238, 1) 1321px),
+      linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      var(--bg);
+    background-size: auto, 32px 32px, 32px 32px;
+  }
+
   .site-header {
     align-items: flex-start;
     flex-direction: column;
