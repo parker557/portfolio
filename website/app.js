@@ -367,7 +367,7 @@ document.getElementById("tryLiveInference")?.addEventListener("click", async () 
     });
     const payload = await response.json();
     liveStatus.textContent = payload.status || "endpoint returned a response";
-    labJsonOutput.textContent = JSON.stringify(payload, null, 2);
+    renderLivePayload(payload, response.ok);
   } catch (error) {
     liveStatus.textContent = "endpoint not available on local static preview";
     labJsonOutput.textContent = JSON.stringify(
@@ -381,6 +381,74 @@ document.getElementById("tryLiveInference")?.addEventListener("click", async () 
     );
   }
 });
+
+function renderLivePayload(payload, isOk) {
+  const results = payload?.parsed?.results || [];
+
+  if (isOk && Array.isArray(results)) {
+    labDetectionCount.textContent = String(results.length);
+    labAvgTime.textContent = "live";
+    drawLiveDetections(results);
+  }
+
+  labJsonOutput.textContent = JSON.stringify(payload.parsed || payload, null, 2);
+}
+
+function drawLiveDetections(results) {
+  if (!labSearchImage || !labResultImage || !Array.isArray(results) || results.length === 0) return;
+
+  const width = labSearchImage.naturalWidth || labSearchImage.width;
+  const height = labSearchImage.naturalHeight || labSearchImage.height;
+  if (!width || !height) return;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(labSearchImage, 0, 0, width, height);
+
+  ctx.lineWidth = Math.max(3, Math.round(width / 320));
+  ctx.font = `${Math.max(16, Math.round(width / 48))}px Arial, sans-serif`;
+
+  results.forEach((result, index) => {
+    const bbox = result.bbox_2d || result.bbox || result.box;
+    if (!Array.isArray(bbox) || bbox.length < 4) return;
+
+    const [x1, y1, x2, y2] = normalizeBbox(bbox, width, height);
+    const label = result.label || `match ${index + 1}`;
+
+    ctx.strokeStyle = "#2f5f98";
+    ctx.fillStyle = "rgba(47, 95, 152, 0.16)";
+    ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+    ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+
+    const text = `${index + 1}. ${label}`;
+    const textWidth = ctx.measureText(text).width + 12;
+    const labelY = Math.max(0, y1 - 28);
+    ctx.fillStyle = "#172033";
+    ctx.fillRect(x1, labelY, textWidth, 24);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(text, x1 + 6, labelY + 18);
+  });
+
+  labResultImage.src = canvas.toDataURL("image/jpeg", 0.9);
+}
+
+function normalizeBbox(bbox, width, height) {
+  const numbers = bbox.slice(0, 4).map(Number);
+  const max = Math.max(...numbers);
+
+  if (max <= 1) {
+    return [
+      numbers[0] * width,
+      numbers[1] * height,
+      numbers[2] * width,
+      numbers[3] * height
+    ];
+  }
+
+  return numbers;
+}
 
 let trackingOn = false;
 let rafId = null;
