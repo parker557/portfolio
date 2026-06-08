@@ -102,6 +102,25 @@
         </aside>
       </section>
 
+      <section class="section jump-strip" aria-label="Quick page shortcuts">
+        <a href="#lab">
+          <strong>Demo Lab</strong>
+          <span>Qwen, DeepSeek, tracking, chat, SaaS replay</span>
+        </a>
+        <a href="#projects">
+          <strong>Projects</strong>
+          <span>Search by stack, project name, or evidence</span>
+        </a>
+        <a href="#demos">
+          <strong>Preview</strong>
+          <span>Open focused screenshots and demo notes</span>
+        </a>
+        <a href="#experience">
+          <strong>Experience</strong>
+          <span>Recent AI and infrastructure work</span>
+        </a>
+      </section>
+
       <section class="section brain-strip" aria-label="Robotics AI workflow">
         <article>
           <span>01</span>
@@ -318,6 +337,19 @@
           </p>
         </div>
 
+        <div class="project-tools">
+          <label class="project-search" for="projectSearch">
+            <span>Search projects</span>
+            <input
+              id="projectSearch"
+              type="search"
+              autocomplete="off"
+              placeholder="Try Qwen, RealSense, Firebase, Docker, finance..."
+            />
+          </label>
+          <p id="projectSearchStatus">Showing 6 projects</p>
+        </div>
+
         <div class="project-filter" role="group" aria-label="Filter projects">
           <button class="active" data-filter="all" type="button">All</button>
           <button data-filter="ai" type="button">AI and vision</button>
@@ -489,6 +521,8 @@
             </div>
           </article>
         </div>
+
+        <p class="project-empty" id="projectEmpty" hidden>No matching projects. Try a different keyword or switch back to All.</p>
 
         <aside class="project-detail" id="projectDetail" aria-live="polite">
           <div>

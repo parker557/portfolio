@@ -453,6 +453,9 @@ const demoButtons = document.querySelectorAll("[data-demo]");
 const labModeButtons = document.querySelectorAll("[data-lab-mode]");
 const filterButtons = document.querySelectorAll("[data-filter]");
 const projectCards = document.querySelectorAll(".project-card");
+const projectSearchInput = document.getElementById("projectSearch");
+const projectSearchStatus = document.getElementById("projectSearchStatus");
+const projectEmpty = document.getElementById("projectEmpty");
 const projectDetailTitle = document.getElementById("projectDetailTitle");
 const projectDetailBody = document.getElementById("projectDetailBody");
 const sampleSelect = document.getElementById("sampleSelect");
@@ -482,6 +485,7 @@ const runRecordedButton = document.getElementById("runRecordedDemo");
 const tryLiveButton = document.getElementById("tryLiveInference");
 
 let currentLabMode = "qwen";
+let activeProjectFilter = "all";
 
 function setDemo(name, shouldScroll = true, shouldUpdateHash = true) {
   const demo = demos[name] || demos.qwen;
@@ -524,20 +528,54 @@ document.querySelectorAll("[data-project-open]").forEach((button) => {
 });
 
 function setProjectFilter(filterName) {
+  activeProjectFilter = filterName || "all";
   filterButtons.forEach((button) => {
-    button.classList.toggle("active", button.dataset.filter === filterName);
+    button.classList.toggle("active", button.dataset.filter === activeProjectFilter);
   });
+
+  applyProjectFilters();
+}
+
+function applyProjectFilters() {
+  const query = normalizeSearch(projectSearchInput?.value || "");
+  let visibleCount = 0;
 
   projectCards.forEach((card) => {
     const categories = (card.dataset.category || "").split(/\s+/);
-    const shouldShow = filterName === "all" || categories.includes(filterName);
+    const filterMatch = activeProjectFilter === "all" || categories.includes(activeProjectFilter);
+    const text = normalizeSearch(`${card.dataset.project || ""} ${card.dataset.category || ""} ${card.textContent}`);
+    const searchMatch = !query || text.includes(query);
+    const shouldShow = filterMatch && searchMatch;
     card.classList.toggle("is-hidden", !shouldShow);
+    if (shouldShow) visibleCount += 1;
   });
+
+  updateProjectSearchStatus(visibleCount, query);
+}
+
+function normalizeSearch(value) {
+  return value.toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+function updateProjectSearchStatus(count, query) {
+  if (projectSearchStatus) {
+    const noun = count === 1 ? "project" : "projects";
+    const filterText = activeProjectFilter === "all" ? "all categories" : activeProjectFilter;
+    projectSearchStatus.textContent = query
+      ? `Showing ${count} ${noun} for "${projectSearchInput.value.trim()}" in ${filterText}`
+      : `Showing ${count} ${noun}`;
+  }
+
+  if (projectEmpty) {
+    projectEmpty.hidden = count !== 0;
+  }
 }
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => setProjectFilter(button.dataset.filter));
 });
+
+projectSearchInput?.addEventListener("input", applyProjectFilters);
 
 function populateLabOptions(mode) {
   if (!sampleSelect) return;

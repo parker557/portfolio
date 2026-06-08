@@ -60,6 +60,10 @@ canvas {
   max-width: 100%;
 }
 
+img {
+  height: auto;
+}
+
 button,
 .button {
   border: 0;
@@ -279,7 +283,8 @@ nav a:hover {
 .project-detail,
 .evidence-band article,
 .brain-strip article,
-.lab-shell {
+.lab-shell,
+.jump-strip a {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--paper);
@@ -354,7 +359,9 @@ nav a:hover {
 .mini-gallery img {
   width: 100%;
   height: 168px;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
+  background: #eef3ec;
 }
 
 .mini-gallery figcaption {
@@ -442,6 +449,35 @@ nav a:hover {
   gap: 12px;
   padding-top: 28px;
   padding-bottom: 18px;
+}
+
+.jump-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.jump-strip a {
+  display: grid;
+  gap: 5px;
+  padding: 14px 15px;
+  box-shadow: var(--shadow-light);
+}
+
+.jump-strip strong {
+  color: var(--ink);
+}
+
+.jump-strip span {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.jump-strip a:hover {
+  border-color: var(--teal);
+  transform: translateY(-1px);
 }
 
 .brain-strip article {
@@ -556,14 +592,15 @@ nav a:hover {
 
 .capture-card img {
   width: 100%;
-  height: 270px;
-  object-fit: cover;
+  height: clamp(230px, 27vw, 360px);
+  object-fit: contain;
   object-position: top center;
+  background: #f2f5ef;
   border-bottom: 1px solid var(--line);
 }
 
 .capture-card.large img {
-  height: 560px;
+  height: clamp(360px, 48vw, 620px);
 }
 
 .capture-card figcaption {
@@ -742,7 +779,9 @@ nav a:hover {
 .lab-images img {
   width: 100%;
   height: 230px;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
+  background: #eef3ec;
 }
 
 .lab-images figcaption {
@@ -783,6 +822,46 @@ nav a:hover {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
+}
+
+.project-tools {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  margin: -4px 0 16px;
+}
+
+.project-search {
+  display: grid;
+  gap: 7px;
+}
+
+.project-search span {
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 760;
+}
+
+.project-search input {
+  min-height: 44px;
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  font: inherit;
+  padding: 0 13px;
+}
+
+.project-search input::placeholder {
+  color: #7a8492;
+}
+
+#projectSearchStatus {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 .project-filter {
@@ -848,13 +927,35 @@ nav a:hover {
   display: none;
 }
 
+.project-empty {
+  margin: 14px 0 0;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  background: #fffdf7;
+  color: var(--muted);
+  padding: 14px;
+}
+
 .project-card > img,
-.diagram,
 .tracking-canvas {
   width: 100%;
   height: 208px;
-  object-fit: cover;
+  border-bottom: 1px solid var(--line);
+  background: #eff3ec;
+}
+
+.project-card > img {
+  object-fit: contain;
   object-position: top center;
+}
+
+.tracking-canvas {
+  object-fit: contain;
+}
+
+.diagram {
+  width: 100%;
+  height: 208px;
   border-bottom: 1px solid var(--line);
   background: #eff3ec;
 }
@@ -1023,7 +1124,9 @@ nav a:hover {
 .demo-images img {
   width: 100%;
   height: 190px;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
+  background: #eef3ec;
 }
 
 .demo-images figcaption {
@@ -1042,9 +1145,10 @@ nav a:hover {
 
 .demo-capture img {
   width: 100%;
-  height: 330px;
-  object-fit: cover;
+  height: min(58vh, 430px);
+  object-fit: contain;
   object-position: top center;
+  background: #eef3ec;
 }
 
 .demo-capture figcaption {
@@ -1172,6 +1276,7 @@ nav a:hover {
 @media (max-width: 1020px) {
   .hero,
   .project-grid,
+  .jump-strip,
   .two-column,
   .contact,
   .demo-layout,
@@ -1181,6 +1286,10 @@ nav a:hover {
   .capture-grid,
   .lab-shell {
     grid-template-columns: 1fr;
+  }
+
+  .jump-strip {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .capture-card.large {
@@ -1250,6 +1359,8 @@ nav a:hover {
   .lab-images,
   .lab-result-meta,
   .upload-grid,
+  .project-tools,
+  .jump-strip,
   .lab-proof-grid,
   .lab-mode-tabs {
     grid-template-columns: 1fr;
@@ -1258,7 +1369,7 @@ nav a:hover {
   .capture-card img,
   .capture-card.large img,
   .demo-capture img {
-    height: 250px;
+    height: min(58vh, 320px);
   }
 
   .quick-facts div,
