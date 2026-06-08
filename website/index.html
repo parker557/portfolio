@@ -179,6 +179,7 @@
           <figure class="capture-card large">
             <img src="./assets/project-captures/property-owner-dashboard.png" alt="Property Management System owner dashboard running locally" />
             <figcaption>
+              <span class="proof-pill">Local run</span>
               <strong>Property Management System</strong>
               <span>Express app running on localhost, owner login tested with session-backed dashboard.</span>
             </figcaption>
@@ -186,6 +187,7 @@
           <figure class="capture-card">
             <img src="./assets/project-captures/rentconnect-home.png" alt="RentConnect React application running locally" />
             <figcaption>
+              <span class="proof-pill">Local run</span>
               <strong>RentConnect</strong>
               <span>React app compiled after restoring a missing image asset; shown with real local page output.</span>
             </figcaption>
@@ -193,6 +195,7 @@
           <figure class="capture-card">
             <img src="./assets/project-captures/e2ee-terminal.png" alt="E2EE Chat Docker Compose service layout terminal evidence" />
             <figcaption>
+              <span class="proof-pill">Terminal evidence</span>
               <strong>E2EE Chat</strong>
               <span>Docker/Nginx/MySQL/Flask deployment shape, with video evidence in the demo panel.</span>
             </figcaption>
@@ -200,6 +203,7 @@
           <figure class="capture-card">
             <img src="./assets/project-captures/finance-terminal.png" alt="AI Finance Advisor local report workflow terminal evidence" />
             <figcaption>
+              <span class="proof-pill">Report workflow</span>
               <strong>AI Finance Advisor</strong>
               <span>Local report-generation workflow shown as a review-first AI draft system.</span>
             </figcaption>
@@ -210,24 +214,43 @@
       <section class="section" id="lab" aria-labelledby="lab-title">
         <div class="section-heading">
           <p class="eyebrow">Robotics AI Demo Lab</p>
-          <h2 id="lab-title">Replay a real Qwen3-VL run, then try your own prompt and images.</h2>
+          <h2 id="lab-title">Try small demos from the actual portfolio projects.</h2>
           <p>
-            The recorded samples below use real files from my Qwen3-VL DuoImage Detector project.
-            Live inference runs through a server-side Cloudflare Pages Function backed by DashScope,
-            so the model key is kept out of browser JavaScript.
+            I kept this lab compact on purpose: each mode shows a runnable slice, a replay, or a
+            constrained API-backed draft. Qwen uses DashScope through a server-side Pages Function;
+            Property and Finance can use DeepSeek the same way, without exposing keys in browser code.
           </p>
         </div>
 
         <div class="lab-shell">
           <div class="lab-controls">
+            <div class="lab-mode-tabs" role="tablist" aria-label="Demo lab modes">
+              <button class="active" data-lab-mode="qwen" type="button">Qwen VLM</button>
+              <button data-lab-mode="property" type="button">Property AI</button>
+              <button data-lab-mode="finance" type="button">Finance draft</button>
+              <button data-lab-mode="tracking" type="button">Tracking state</button>
+              <button data-lab-mode="chat" type="button">Secure chat</button>
+              <button data-lab-mode="rentconnect" type="button">RentConnect</button>
+            </div>
+            <p class="lab-mode-intro" id="labModeIntro">
+              Reference-guided detection with recorded samples and an optional live Qwen3-VL call.
+            </p>
+            <div class="lab-proof-grid" aria-label="Demo evidence map">
+              <span><strong>Qwen</strong> live VLM call</span>
+              <span><strong>Property</strong> staff draft</span>
+              <span><strong>Finance</strong> review draft</span>
+              <span><strong>Tracking</strong> object state</span>
+              <span><strong>Chat</strong> service flow</span>
+              <span><strong>RentConnect</strong> UI path</span>
+            </div>
             <div class="control-row">
-              <label for="sampleSelect">Recorded sample</label>
+              <label id="labSampleLabel" for="sampleSelect">Recorded sample</label>
               <select id="sampleSelect">
                 <option value="test1">Mouse objects, 3 detections</option>
                 <option value="test2">Standee objects, 4 detections</option>
               </select>
             </div>
-            <div class="upload-grid">
+            <div class="upload-grid lab-qwen-control">
               <label class="upload-box">
                 <span>Reference image</span>
                 <input id="refUpload" type="file" accept="image/*" />
@@ -238,7 +261,7 @@
               </label>
             </div>
             <label class="prompt-box" for="labPrompt">
-              <span>Prompt</span>
+              <span id="labPromptLabel">Prompt</span>
               <textarea id="labPrompt" rows="7">Based on the two images above. The first image shows a target object. The second image contains multiple target objects. Find all objects of the same type in the second image and return JSON bounding boxes only.</textarea>
             </label>
             <div class="hero-actions">
@@ -246,7 +269,7 @@
               <button class="button secondary" id="tryLiveInference" type="button">Try live endpoint</button>
             </div>
             <p class="lab-note">
-              Live endpoint status: <strong id="liveStatus">recorded replay ready</strong>.
+              Endpoint status: <strong id="liveStatus">recorded replay ready</strong>.
               <span id="liveHelpText">Click Try live endpoint to call the server-side Qwen/VLM function.</span>
             </p>
           </div>
@@ -255,29 +278,29 @@
             <div class="lab-images">
               <figure>
                 <img id="labRefImage" src="./assets/qwen-test1-ref.jpg" alt="Recorded reference input" />
-                <figcaption>Reference</figcaption>
+                <figcaption id="labRefCaption">Reference</figcaption>
               </figure>
               <figure>
                 <img id="labSearchImage" src="./assets/qwen-test1-search.jpg" alt="Recorded search input" />
-                <figcaption>Search image</figcaption>
+                <figcaption id="labSearchCaption">Search image</figcaption>
               </figure>
               <figure>
                 <img id="labResultImage" src="./assets/qwen-test1-result.jpg" alt="Recorded Qwen3-VL result" />
-                <figcaption>Recorded result</figcaption>
+                <figcaption id="labResultCaption">Recorded result</figcaption>
               </figure>
             </div>
             <div class="lab-result-meta">
               <div>
                 <strong id="labDetectionCount">3</strong>
-                <span>detections</span>
+                <span id="labMetricOneLabel">detections</span>
               </div>
               <div>
                 <strong id="labAvgTime">7-8s</strong>
-                <span>recorded run time</span>
+                <span id="labMetricTwoLabel">recorded run time</span>
               </div>
               <div>
-                <strong>JSON</strong>
-                <span>bbox output</span>
+                <strong id="labOutputKind">JSON</strong>
+                <span id="labMetricThreeLabel">bbox output</span>
               </div>
             </div>
             <pre class="demo-log"><code id="labJsonOutput"></code></pre>

@@ -572,6 +572,17 @@ nav a:hover {
   padding: 13px 14px 15px;
 }
 
+.proof-pill {
+  width: fit-content;
+  border: 1px solid rgba(23, 106, 97, 0.24);
+  border-radius: 999px;
+  background: #eef8f3;
+  color: #135b55;
+  padding: 3px 8px;
+  font-size: 0.72rem;
+  font-weight: 760;
+}
+
 .capture-card strong {
   color: var(--ink);
 }
@@ -592,6 +603,54 @@ nav a:hover {
   display: grid;
   align-content: start;
   gap: 14px;
+}
+
+.lab-mode-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+
+.lab-mode-tabs button {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--muted);
+  padding: 0 10px;
+  font-size: 0.9rem;
+}
+
+.lab-mode-tabs button.active {
+  border-color: var(--teal);
+  background: #e5f3ef;
+  color: #0e5c58;
+  font-weight: 760;
+}
+
+.lab-mode-intro {
+  margin: -2px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.lab-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.lab-proof-grid span {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdf9;
+  color: var(--muted);
+  padding: 8px 9px;
+  font-size: 0.82rem;
+}
+
+.lab-proof-grid strong {
+  color: var(--ink);
 }
 
 .control-row,
@@ -655,6 +714,10 @@ nav a:hover {
   margin: 0;
   color: var(--muted);
   font-size: 0.92rem;
+}
+
+.lab-field-hidden {
+  display: none;
 }
 
 .lab-output {
@@ -1186,7 +1249,9 @@ nav a:hover {
   .metrics,
   .lab-images,
   .lab-result-meta,
-  .upload-grid {
+  .upload-grid,
+  .lab-proof-grid,
+  .lab-mode-tabs {
     grid-template-columns: 1fr;
   }
 

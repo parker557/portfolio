@@ -237,24 +237,251 @@ const qwenLabSamples = {
   }
 };
 
+const labModes = {
+  qwen: {
+    type: "qwen",
+    intro: "Reference-guided detection with recorded samples and an optional live Qwen3-VL call.",
+    sampleLabel: "Recorded sample",
+    promptLabel: "Prompt",
+    primaryText: "Run recorded replay",
+    secondaryText: "Try live endpoint",
+    help: "Click Try live endpoint to call the server-side Qwen/VLM function.",
+    options: [
+      { value: "test1", label: "Mouse objects, 3 detections" },
+      { value: "test2", label: "Standee objects, 4 detections" }
+    ]
+  },
+  property: {
+    type: "deepseek",
+    endpointMode: "property",
+    linkedDemo: "property",
+    intro: "Triage a property-management request and produce a short staff-facing draft.",
+    sampleLabel: "Workflow sample",
+    promptLabel: "Tenant / staff context",
+    primaryText: "Run workflow replay",
+    secondaryText: "Try DeepSeek endpoint",
+    help: "DeepSeek can draft the triage note through a server-side Pages Function.",
+    options: [
+      {
+        value: "leak_triage",
+        label: "Leak request triage",
+        prompt:
+          "Tenant says water is leaking from the bathroom ceiling after 10pm. The owner dashboard needs a short priority note, a staff reply, and next actions. Keep it concise and operational.",
+        images: {
+          ref: "./assets/project-captures/property-login.png",
+          search: "./assets/project-captures/property-staff-dashboard.png",
+          result: "./assets/project-captures/property-owner-dashboard.png"
+        },
+        captions: ["Login/session flow", "Staff dashboard", "Owner dashboard"],
+        metrics: ["3", "roles touched", "AI", "triage draft", "JSON", "handoff note"],
+        replay: {
+          priority: "urgent",
+          issue_type: "water leak",
+          staff_reply:
+            "I logged this as urgent because there may be active water damage. Please share a photo and confirm whether the leak is still running.",
+          next_actions: ["open repair request", "notify owner", "assign maintenance", "track follow-up"]
+        }
+      },
+      {
+        value: "notice_summary",
+        label: "Resident notice summary",
+        prompt:
+          "Summarize a property notice for residents: elevator maintenance on Friday 9am-1pm, service team on site, access to floors may be delayed. Keep it clear and polite.",
+        images: {
+          ref: "./assets/project-captures/property-owner-dashboard.png",
+          search: "./assets/project-captures/property-staff-dashboard.png",
+          result: "./assets/project-captures/property-terminal.png"
+        },
+        captions: ["Owner view", "Staff view", "Server output"],
+        metrics: ["2", "dashboards", "Notice", "summary", "Review", "before sending"],
+        replay: {
+          notice:
+            "Elevator maintenance is scheduled for Friday from 9:00am to 1:00pm. A service team will be on site, and access between floors may be delayed during that window.",
+          tone: "clear, polite, operational",
+          review_required: true
+        }
+      }
+    ]
+  },
+  finance: {
+    type: "deepseek",
+    endpointMode: "finance",
+    linkedDemo: "finance",
+    intro: "Generate a review-first financial report draft from a small sample profile.",
+    sampleLabel: "Report sample",
+    promptLabel: "Profile / report request",
+    primaryText: "Run report replay",
+    secondaryText: "Try DeepSeek endpoint",
+    help: "This is a draft-writing demo only, not financial advice.",
+    options: [
+      {
+        value: "cashflow_review",
+        label: "Cashflow review draft",
+        prompt:
+          "Create a cautious financial report draft for a new graduate tracking rent, phone bill, food, transit, and emergency savings. Do not give investment advice. Do not invent prices or dollar amounts; use placeholders and questions to verify.",
+        images: {
+          ref: "./assets/project-captures/finance-terminal.png",
+          search: "./assets/project-captures/finance-terminal.png",
+          result: "./assets/project-captures/finance-terminal.png"
+        },
+        captions: ["Local workflow", "Report script", "Terminal evidence"],
+        metrics: ["Draft", "review first", "0", "advice claims", "MD", "report output"],
+        replay: {
+          scope: "budget and cashflow draft",
+          not_financial_advice: true,
+          sections: ["context summary", "monthly cost checklist", "risk notes", "questions to verify"],
+          next_step: "review numbers manually before using the report"
+        }
+      },
+      {
+        value: "job_budget",
+        label: "Relocation budget draft",
+        prompt:
+          "Draft a relocation budget checklist for moving to Toronto for a first software role. Include rent deposit, phone, transport, food, laptop/cloud costs, and emergency buffer. No investment advice and no invented dollar amounts.",
+        images: {
+          ref: "./assets/project-captures/finance-terminal.png",
+          search: "./assets/project-captures/property-owner-dashboard.png",
+          result: "./assets/project-captures/rentconnect-home.png"
+        },
+        captions: ["Finance workflow", "Housing context", "Rental UI context"],
+        metrics: ["Budget", "checklist", "Toronto", "relocation", "Manual", "review"],
+        replay: {
+          checklist: ["first month rent", "deposit", "phone plan", "transit", "food", "cloud/tool costs"],
+          buffer_note: "keep a separate emergency buffer before taking on new recurring costs",
+          review_required: true
+        }
+      }
+    ]
+  },
+  tracking: {
+    type: "static",
+    linkedDemo: "tracking",
+    intro: "Replay a structured perception state instead of only showing a mask on screen.",
+    sampleLabel: "Tracking sample",
+    promptLabel: "Object-state request",
+    primaryText: "Run state replay",
+    secondaryText: "Open preview panel",
+    help: "This is a local replay of the tracking state shape; no camera is connected on the static site.",
+    options: [
+      {
+        value: "mask_state",
+        label: "Mask + bbox + anchor state",
+        prompt:
+          "Given color/depth input and a SAM mask, output bbox, 2D anchor, depth estimate, state, and a simple pose hint for a robotics demo.",
+        images: {
+          ref: () => makeTrackingFrame(0.2),
+          search: () => makeTrackingFrame(1.4),
+          result: () => makeTrackingFrame(2.6)
+        },
+        captions: ["Frame t0", "Frame t1", "Tracked state"],
+        metrics: ["1", "tracked object", "1.42m", "depth cue", "JSON", "state"],
+        replay: {
+          bbox: [244, 96, 418, 231],
+          anchor_2d: [331, 166],
+          depth_m: 1.42,
+          state: "tracked",
+          pose_hint: "front-left reachable"
+        }
+      }
+    ]
+  },
+  chat: {
+    type: "static",
+    linkedDemo: "chat",
+    intro: "Show the secure-chat service shape: TLS, Flask, MySQL, OTP, and encrypted payload handling.",
+    sampleLabel: "Security sample",
+    promptLabel: "Flow to inspect",
+    primaryText: "Run flow replay",
+    secondaryText: "Open preview panel",
+    help: "The full project depends on local certificates and Docker Compose, so this site shows the inspected flow.",
+    options: [
+      {
+        value: "message_flow",
+        label: "Encrypted message flow",
+        prompt:
+          "Trace a secure message from client login through OTP verification, TLS/Nginx, Flask, MySQL, and encrypted payload handling.",
+        images: {
+          ref: "./assets/project-captures/e2ee-terminal.png",
+          search: "./assets/project-captures/e2ee-terminal.png",
+          result: "./assets/project-captures/e2ee-terminal.png"
+        },
+        captions: ["Docker stack", "TLS/Nginx path", "Service evidence"],
+        metrics: ["4", "services", "OTP", "login check", "TLS", "transport"],
+        replay: {
+          services: ["nginx", "flask webapp", "mysql", "otp setup"],
+          message_status: "encrypted payload queued",
+          deployment_note: "requires local hosts/certificate setup before running cleanly"
+        }
+      }
+    ]
+  },
+  rentconnect: {
+    type: "static",
+    linkedDemo: "rentconnect",
+    intro: "Replay the web-app structure behind the rental SaaS prototype.",
+    sampleLabel: "SaaS sample",
+    promptLabel: "Feature path",
+    primaryText: "Run UI replay",
+    secondaryText: "Open preview panel",
+    help: "This is a static replay of the React/Firebase app structure and local screenshots.",
+    options: [
+      {
+        value: "listing_flow",
+        label: "Listing and account flow",
+        prompt:
+          "Show how the RentConnect prototype connects React routes, Firebase Auth, Firestore-backed data, listing search, Material UI, and payment wiring.",
+        images: {
+          ref: "./assets/project-captures/rentconnect-home.png",
+          search: "./assets/project-captures/rentconnect-features.png",
+          result: "./assets/project-captures/rentconnect-terminal.png"
+        },
+        captions: ["Home page", "Feature section", "Local terminal"],
+        metrics: ["React", "frontend", "Firebase", "auth/data", "Adyen", "wiring"],
+        replay: {
+          frontend: "React + Material UI",
+          data: "Firebase Auth / Firestore config shape",
+          payment: "Adyen client-key wiring only; real payments need backend session flow",
+          next_step: "modernize dependencies and tighten Firebase security rules"
+        }
+      }
+    ]
+  }
+};
+
 const demoOutput = document.getElementById("demoOutput");
 const demoButtons = document.querySelectorAll("[data-demo]");
+const labModeButtons = document.querySelectorAll("[data-lab-mode]");
 const filterButtons = document.querySelectorAll("[data-filter]");
 const projectCards = document.querySelectorAll(".project-card");
 const projectDetailTitle = document.getElementById("projectDetailTitle");
 const projectDetailBody = document.getElementById("projectDetailBody");
 const sampleSelect = document.getElementById("sampleSelect");
+const labSampleLabel = document.getElementById("labSampleLabel");
+const labModeIntro = document.getElementById("labModeIntro");
+const labPromptLabel = document.getElementById("labPromptLabel");
+const labQwenControls = document.querySelectorAll(".lab-qwen-control");
 const refUpload = document.getElementById("refUpload");
 const searchUpload = document.getElementById("searchUpload");
 const labPrompt = document.getElementById("labPrompt");
 const labRefImage = document.getElementById("labRefImage");
 const labSearchImage = document.getElementById("labSearchImage");
 const labResultImage = document.getElementById("labResultImage");
+const labRefCaption = document.getElementById("labRefCaption");
+const labSearchCaption = document.getElementById("labSearchCaption");
+const labResultCaption = document.getElementById("labResultCaption");
 const labJsonOutput = document.getElementById("labJsonOutput");
 const labDetectionCount = document.getElementById("labDetectionCount");
 const labAvgTime = document.getElementById("labAvgTime");
+const labOutputKind = document.getElementById("labOutputKind");
+const labMetricOneLabel = document.getElementById("labMetricOneLabel");
+const labMetricTwoLabel = document.getElementById("labMetricTwoLabel");
+const labMetricThreeLabel = document.getElementById("labMetricThreeLabel");
 const liveStatus = document.getElementById("liveStatus");
 const liveHelpText = document.getElementById("liveHelpText");
+const runRecordedButton = document.getElementById("runRecordedDemo");
+const tryLiveButton = document.getElementById("tryLiveInference");
+
+let currentLabMode = "qwen";
 
 function setDemo(name, shouldScroll = true, shouldUpdateHash = true) {
   const demo = demos[name] || demos.qwen;
@@ -312,16 +539,104 @@ filterButtons.forEach((button) => {
   button.addEventListener("click", () => setProjectFilter(button.dataset.filter));
 });
 
+function populateLabOptions(mode) {
+  if (!sampleSelect) return;
+  sampleSelect.innerHTML = "";
+  mode.options.forEach((option) => {
+    const element = document.createElement("option");
+    element.value = option.value;
+    element.textContent = option.label;
+    sampleSelect.appendChild(element);
+  });
+}
+
+function setLabMode(name) {
+  const mode = labModes[name] || labModes.qwen;
+  currentLabMode = labModes[name] ? name : "qwen";
+
+  labModeButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.labMode === currentLabMode);
+  });
+
+  if (labModeIntro) labModeIntro.textContent = mode.intro;
+  if (labSampleLabel) labSampleLabel.textContent = mode.sampleLabel;
+  if (labPromptLabel) labPromptLabel.textContent = mode.promptLabel;
+  if (runRecordedButton) runRecordedButton.textContent = mode.primaryText;
+  if (tryLiveButton) tryLiveButton.textContent = mode.secondaryText;
+
+  labQwenControls.forEach((element) => {
+    element.classList.toggle("lab-field-hidden", mode.type !== "qwen");
+  });
+
+  populateLabOptions(mode);
+
+  if (mode.type === "qwen") {
+    setLabSample(sampleSelect?.value || "test1");
+  } else {
+    setProjectLabSample(sampleSelect?.value || mode.options[0].value);
+  }
+}
+
 function setLabSample(name) {
   const sample = qwenLabSamples[name] || qwenLabSamples.test1;
   labRefImage.src = sample.ref;
   labSearchImage.src = sample.search;
   labResultImage.src = sample.result;
+  if (labRefCaption) labRefCaption.textContent = "Reference";
+  if (labSearchCaption) labSearchCaption.textContent = "Search image";
+  if (labResultCaption) labResultCaption.textContent = "Recorded result";
   labDetectionCount.textContent = sample.count;
   labAvgTime.textContent = sample.avgTime;
+  if (labOutputKind) labOutputKind.textContent = "JSON";
+  if (labMetricOneLabel) labMetricOneLabel.textContent = "detections";
+  if (labMetricTwoLabel) labMetricTwoLabel.textContent = "recorded run time";
+  if (labMetricThreeLabel) labMetricThreeLabel.textContent = "bbox output";
+  if (labPrompt) {
+    labPrompt.value =
+      "Based on the two images above. The first image shows a target object. The second image contains multiple target objects. Find all objects of the same type in the second image and return JSON bounding boxes only.";
+  }
   labJsonOutput.textContent = JSON.stringify(sample.json, null, 2);
   liveStatus.textContent = "recorded replay loaded";
   setLiveHelp("Recorded sample loaded. Click Try live endpoint to call the server-side DashScope function.");
+}
+
+function setProjectLabSample(value) {
+  const mode = labModes[currentLabMode] || labModes.property;
+  const sample = mode.options.find((item) => item.value === value) || mode.options[0];
+
+  if (labPrompt) labPrompt.value = sample.prompt;
+  setLabImages(sample.images, sample.captions);
+  setLabMetrics(sample.metrics);
+  labJsonOutput.textContent =
+    typeof sample.replay === "string" ? sample.replay : JSON.stringify(sample.replay, null, 2);
+  liveStatus.textContent = mode.type === "deepseek" ? "recorded replay ready" : "static replay ready";
+  setLiveHelp(mode.help);
+}
+
+function setLabImages(images, captions = []) {
+  const ref = resolveLabImage(images.ref);
+  const search = resolveLabImage(images.search);
+  const result = resolveLabImage(images.result);
+  if (labRefImage) labRefImage.src = ref;
+  if (labSearchImage) labSearchImage.src = search;
+  if (labResultImage) labResultImage.src = result;
+  if (labRefCaption) labRefCaption.textContent = captions[0] || "Input";
+  if (labSearchCaption) labSearchCaption.textContent = captions[1] || "Process";
+  if (labResultCaption) labResultCaption.textContent = captions[2] || "Output";
+}
+
+function resolveLabImage(value) {
+  return typeof value === "function" ? value() : value;
+}
+
+function setLabMetrics(metrics) {
+  const [one, oneLabel, two, twoLabel, three, threeLabel] = metrics;
+  labDetectionCount.textContent = one;
+  labAvgTime.textContent = two;
+  if (labOutputKind) labOutputKind.textContent = three;
+  if (labMetricOneLabel) labMetricOneLabel.textContent = oneLabel;
+  if (labMetricTwoLabel) labMetricTwoLabel.textContent = twoLabel;
+  if (labMetricThreeLabel) labMetricThreeLabel.textContent = threeLabel;
 }
 
 function previewUpload(input, targetImage, fallbackResult = false) {
@@ -344,16 +659,48 @@ function previewUpload(input, targetImage, fallbackResult = false) {
   setLiveHelp("Custom images are previewed locally. Click Try live endpoint to send them to the server-side function.");
 }
 
-sampleSelect?.addEventListener("change", () => setLabSample(sampleSelect.value));
+labModeButtons.forEach((button) => {
+  button.addEventListener("click", () => setLabMode(button.dataset.labMode));
+});
 
-document.getElementById("runRecordedDemo")?.addEventListener("click", () => {
-  setLabSample(sampleSelect?.value || "test1");
+sampleSelect?.addEventListener("change", () => {
+  if (currentLabMode === "qwen") {
+    setLabSample(sampleSelect.value);
+  } else {
+    setProjectLabSample(sampleSelect.value);
+  }
+});
+
+runRecordedButton?.addEventListener("click", () => {
+  if (currentLabMode === "qwen") {
+    setLabSample(sampleSelect?.value || "test1");
+    return;
+  }
+
+  setProjectLabSample(sampleSelect?.value || labModes[currentLabMode].options[0].value);
 });
 
 refUpload?.addEventListener("change", () => previewUpload(refUpload, labRefImage));
 searchUpload?.addEventListener("change", () => previewUpload(searchUpload, labSearchImage, true));
 
-document.getElementById("tryLiveInference")?.addEventListener("click", async () => {
+tryLiveButton?.addEventListener("click", async () => {
+  const mode = labModes[currentLabMode] || labModes.qwen;
+  if (mode.type === "deepseek") {
+    await runDeepSeekLiveDemo(mode);
+    return;
+  }
+
+  if (mode.type === "static") {
+    setDemo(mode.linkedDemo || currentLabMode);
+    liveStatus.textContent = "opened preview panel";
+    setLiveHelp("This project is shown as a static replay because the full service depends on local setup.");
+    return;
+  }
+
+  await runQwenLiveInference();
+});
+
+async function runQwenLiveInference() {
   liveStatus.textContent = "checking endpoint...";
   setLiveHelp("Calling the Cloudflare Pages Function. The API key stays on the server side.");
   const formData = new FormData();
@@ -384,7 +731,49 @@ document.getElementById("tryLiveInference")?.addEventListener("click", async () 
       2
     );
   }
-});
+}
+
+async function runDeepSeekLiveDemo(mode) {
+  liveStatus.textContent = "calling DeepSeek endpoint...";
+  setLiveHelp("Calling the Cloudflare Pages Function. The DeepSeek key stays on the server side.");
+
+  try {
+    const response = await fetch("/api/deepseek-demo", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        mode: mode.endpointMode,
+        input: labPrompt?.value || "",
+        sample: sampleSelect?.value || ""
+      })
+    });
+    const raw = await response.text();
+    let payload;
+    try {
+      payload = JSON.parse(raw);
+    } catch {
+      payload = { status: "unexpected response", content: raw };
+    }
+
+    liveStatus.textContent = payload.status || "endpoint returned a response";
+    renderDeepSeekPayload(payload, response.ok);
+    updateDeepSeekHelp(payload, response.ok);
+  } catch (error) {
+    liveStatus.textContent = "endpoint not available on local static preview";
+    setLiveHelp("The static local preview cannot reach the Pages Function. Test this on the deployed Cloudflare Pages site.");
+    labJsonOutput.textContent = JSON.stringify(
+      {
+        status: "deepseek endpoint unavailable",
+        message: "Deploy the Cloudflare Pages Function and add DEEPSEEK_API_KEY as a Pages secret.",
+        error: error.message
+      },
+      null,
+      2
+    );
+  }
+}
 
 function renderLivePayload(payload, isOk) {
   const results = payload?.parsed?.results || [];
@@ -396,6 +785,21 @@ function renderLivePayload(payload, isOk) {
   }
 
   labJsonOutput.textContent = JSON.stringify(payload.parsed || payload, null, 2);
+}
+
+function renderDeepSeekPayload(payload, isOk) {
+  if (isOk && payload?.content) {
+    labDetectionCount.textContent = "live";
+    labAvgTime.textContent = payload.model || "DeepSeek";
+    if (labOutputKind) labOutputKind.textContent = "Text";
+    if (labMetricOneLabel) labMetricOneLabel.textContent = "draft mode";
+    if (labMetricTwoLabel) labMetricTwoLabel.textContent = "model";
+    if (labMetricThreeLabel) labMetricThreeLabel.textContent = "server response";
+    labJsonOutput.textContent = payload.content;
+    return;
+  }
+
+  labJsonOutput.textContent = JSON.stringify(payload, null, 2);
 }
 
 function updateLiveHelp(payload, isOk) {
@@ -420,6 +824,25 @@ function updateLiveHelp(payload, isOk) {
   }
 
   setLiveHelp("Review the JSON output for provider details and next steps.");
+}
+
+function updateDeepSeekHelp(payload, isOk) {
+  if (isOk && payload?.status === "deepseek draft complete") {
+    setLiveHelp("DeepSeek returned a draft. Treat it as review-first output, not a final decision.");
+    return;
+  }
+
+  if (payload?.status === "deepseek endpoint not configured") {
+    setLiveHelp("Add DEEPSEEK_API_KEY as a Cloudflare Pages secret, then redeploy the site.");
+    return;
+  }
+
+  if (payload?.status === "deepseek request failed") {
+    setLiveHelp("Check the DeepSeek key, model name, base URL, quota, and account permissions.");
+    return;
+  }
+
+  setLiveHelp("Review the response details and endpoint status.");
 }
 
 function setLiveHelp(message) {
@@ -537,6 +960,14 @@ function drawTracking(canvas, t = 0) {
   ctx.fillText(`anchor: [${Math.round(cx)}, ${Math.round(cy)}]  depth: ${(1.2 + Math.sin(t) * 0.2).toFixed(2)}m`, 24, h - 24);
 }
 
+function makeTrackingFrame(t) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 720;
+  canvas.height = 360;
+  drawTracking(canvas, t);
+  return canvas.toDataURL("image/png");
+}
+
 function animateTracking() {
   const canvases = [
     document.getElementById("trackingCanvas"),
@@ -568,7 +999,7 @@ function initFromHash() {
 
   setDemo("qwen", false, false);
   setProjectFilter("all");
-  setLabSample("test1");
+  setLabMode("qwen");
 
   if (noteMatch && projectDetails[noteMatch[1]]) {
     openProjectNote(noteMatch[1], false);
