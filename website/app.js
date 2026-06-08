@@ -1,3 +1,416 @@
+const LANG_STORAGE_KEY = "zhengJiangPortfolioLanguage";
+let currentLang = localStorage.getItem(LANG_STORAGE_KEY) === "zh" ? "zh" : "en";
+let currentDemoName = "qwen";
+let currentProjectNoteName = "qwen";
+
+const originalDocumentTitle = document.title;
+const originalMetaDescription = document.querySelector('meta[name="description"]')?.content || "";
+const originalStaticValues = new Map();
+
+const zhStaticCopy = [
+  { selector: ".brand small", text: "AI 应用与机器人 Demo" },
+  { selectorAll: "nav a", text: ["实验室", "项目", "预览", "过程", "经历", "联系", "简历"] },
+  { selector: ".hero-copy > .eyebrow", text: "AI 应用项目记录" },
+  {
+    selector: ".hero-copy h1",
+    text: "能跑起来、能留日志、也方便工程师复查的 AI Demo。"
+  },
+  {
+    selector: ".hero-copy .lead",
+    text:
+      "我主要做偏应用层的 AI 项目：Qwen VLM Demo、FastAPI/vLLM 接口、批量检测、RealSense + SAM 追踪、Jetson AGX Orin 测试和 RAG/LoRA 实验。我会把输入、日志、截图和启动说明留在项目里，方便别人复查。"
+  },
+  { selectorAll: ".hero-copy .hero-actions .button", text: ["打开 Demo Lab", "查看项目记录", "GitHub", "简历"] },
+  { selectorAll: ".quick-facts dt", text: ["教育背景", "适合岗位", "核心技术"] },
+  {
+    selectorAll: ".quick-facts dd",
+    text: [
+      "香港理工大学计算机理学士（荣誉）",
+      "初级 AI Developer、GenAI Developer、AI Application Engineer、Software Engineer",
+      "Python, FastAPI, vLLM, PyTorch, Docker, Linux, React, Node.js, Nginx"
+    ]
+  },
+  { selector: ".status-strip span", text: "在线接口" },
+  { selector: ".status-strip strong", text: "DashScope Qwen3-VL 已接入" },
+  { selector: ".panel-topline span", text: "当前展示" },
+  { selector: ".panel-topline strong", text: "Qwen3-VL 双图检测器" },
+  { selectorAll: ".mini-gallery figcaption", text: ["参考图", "搜索图", "渲染结果"] },
+  {
+    selectorAll: ".build-log p",
+    html: [
+      "<strong>问题：</strong>用一张参考图，在另一张大图里找同类目标。",
+      "<strong>实现：</strong>图像配对、提示词构造、JSON 解析、坐标换算、CSV/XLSX 汇总和框选结果渲染。",
+      "<strong>价值：</strong>结果既能看图确认，也能看文件复查，调试和交接都更轻。"
+    ]
+  },
+  { selectorAll: ".build-meta dt", text: ["技术栈", "网站风格"] },
+  {
+    selectorAll: ".build-meta dd",
+    text: ["Python, Qwen VLM, Cloudflare Pages Function", "真实截图、短说明、不放素材感插图"]
+  },
+  { selectorAll: ".jump-strip strong", text: ["Demo Lab", "项目", "预览", "经历"] },
+  {
+    selectorAll: ".jump-strip span",
+    text: [
+      "Qwen、DeepSeek、追踪、聊天、SaaS 回放",
+      "按技术栈、项目名或证据搜索",
+      "查看截图和 Demo 说明",
+      "近期 AI 和基础设施工作"
+    ]
+  },
+  { selectorAll: ".brain-strip h2", text: ["感知", "推理", "控制交接", "端侧测试"] },
+  {
+    selectorAll: ".brain-strip p",
+    text: [
+      "VLM 输入、RealSense 彩色/深度流、mask、bbox 和目标状态输出。",
+      "提示词、JSON 解析、RAG/LoRA 实验和模型接口流程。",
+      "2D/3D 锚点、姿态提示、日志、CSV 汇总，以及便于复查的说明。",
+      "Jetson AGX Orin、JetPack 6.2、RK3588/RKNN、Docker/Linux 和部署检查。"
+    ]
+  },
+  { selector: "#stack-title", text: "我在项目或 Demo 中实际用过的工具" },
+  { selectorAll: ".evidence-band p", text: ["带源码或预览的项目记录", "AI 工作流：模型接口、多模态检测、机器人感知", "Cloudflare Pages 静态站，不暴露 API key，附简历"] },
+  { selector: ".run-evidence .eyebrow", text: "运行证据" },
+  { selector: "#evidence-title", text: "这些截图来自我本地启动和检查过的项目。" },
+  {
+    selector: ".run-evidence .section-heading p:not(.eyebrow)",
+    text:
+      "我把证据放在页面上，是因为它比一句“做过项目”更有用。有的旧项目能顺利跑起来，有的需要补依赖或外部服务，我会直接写清楚。"
+  },
+  { selectorAll: ".proof-pill", text: ["本地运行", "本地运行", "终端证据", "报告流程"] },
+  {
+    selectorAll: ".capture-card figcaption strong",
+    text: ["Property Management System", "RentConnect", "E2EE Chat", "AI Finance Advisor"]
+  },
+  {
+    selectorAll: ".capture-card figcaption span:not(.proof-pill)",
+    text: [
+      "Express 应用在 localhost 启动，测试了 owner 登录和 session-backed dashboard。",
+      "恢复缺失图片资源后，React 应用成功编译，并用真实本地页面截图展示。",
+      "Docker/Nginx/MySQL/Flask 部署结构，Demo 面板里也放了视频证据。",
+      "本地报告生成流程，定位是先出草稿、再人工 review 的 AI 工作流。"
+    ]
+  },
+  { selector: "#lab .section-heading .eyebrow", text: "机器人 AI Demo Lab" },
+  { selector: "#lab-title", text: "试几个来自真实项目的小型 Demo。" },
+  {
+    selector: "#lab .section-heading p:not(.eyebrow)",
+    text:
+      "这里没有把 Demo 做得很花。每个模式只保留一个能说明问题的小切片、回放或服务端草稿；Qwen 和 DeepSeek 都通过 Cloudflare Pages Function 调用，浏览器里不放 key。"
+  },
+  {
+    selectorAll: ".lab-proof-grid span",
+    html: [
+      "<strong>Qwen</strong> 在线 VLM 调用",
+      "<strong>Property</strong> 员工回复草稿",
+      "<strong>Finance</strong> 报告草稿",
+      "<strong>Tracking</strong> 目标状态",
+      "<strong>Chat</strong> 服务流程",
+      "<strong>RentConnect</strong> UI 路径"
+    ]
+  },
+  { selectorAll: ".upload-box span", text: ["参考图", "搜索图"] },
+  { selector: "#projects .section-heading .eyebrow", text: "项目精选" },
+  { selector: "#projects-title", text: "HR 或工程师可以快速扫读的项目记录" },
+  {
+    selector: "#projects .section-heading p:not(.eyebrow)",
+    text:
+      "我刻意写得短一点。每张卡只讲问题、我做了什么、有什么证据；下面的 Demo 按钮会在页面内更新预览，不需要跳走。"
+  },
+  { selector: ".project-search span", text: "搜索项目" },
+  { selector: "#projectSearch", attr: "placeholder", value: "试试 Qwen、RealSense、Firebase、Docker、finance..." },
+  { selectorAll: ".project-filter button", text: ["全部", "AI 与视觉", "机器人", "全栈", "系统"] },
+  {
+    selectorAll: ".project-card .tag",
+    text: ["GenAI + 计算机视觉", "全栈 AI 应用", "机器人感知", "安全 + Web", "React + Firebase", "AI 工作流"]
+  },
+  { selectorAll: ".project-notes dt", text: ["问题", "实现", "证据", "问题", "实现", "证据", "问题", "实现", "证据", "问题", "实现", "证据", "问题", "实现", "证据", "问题", "实现", "证据"] },
+  {
+    selectorAll: ".project-notes dd",
+    text: [
+      "用单独参考图，在搜索图中找同类目标。",
+      "做了图像配对、VLM 提示词、JSON 解析、坐标换算和结果渲染。",
+      "参考图、搜索图、结果图、JSON、CSV/XLSX 汇总路径。",
+      "把租客问题和员工更新变成可追踪流程。",
+      "Node.js、Socket.IO、登录 session、owner/staff dashboard、聊天和 AI 回复路径。",
+      "有可运行原型结构和端到端请求流程。",
+      "让目标状态能被机器人 Demo 使用，而不只是屏幕上看见 mask。",
+      "整理了彩色/深度输入、mask tracking、bbox、2D/3D anchor 和姿态提示。",
+      "Canvas 预览和结构化目标状态会显示在 Demo 面板。",
+      "设计一个便于复查传输、登录和消息处理的聊天应用。",
+      "Flask、MySQL、Docker Compose、TLS/Nginx、OTP/MFA 和加密设计说明。",
+      "项目文件夹中保留部署说明和安全流程文档。",
+      "做带账号、房源和现代 Web UI 的地产 SaaS 流程。",
+      "React、Firebase Auth、Firestore、Material UI、Redux Toolkit 和支付接线。",
+      "有展示截图和源码目录结构。",
+      "把本地财务上下文转成结构化报告草稿。",
+      "Python 读取本地输入，调用 LLM API，并输出 Markdown 报告。",
+      "报告骨架和 review-first 流程；不是财务建议。"
+    ]
+  },
+  { selectorAll: ".card-actions .button", text: ["Demo", "记录", "源码", "Demo", "记录", "源码", "Demo", "记录", "动画", "Demo", "记录", "源码", "Demo", "记录", "源码", "Demo", "记录", "源码"] },
+  { selector: "#projectEmpty", text: "没有匹配项目。换个关键词，或者切回全部。" },
+  { selector: "#demos .section-heading .eyebrow", text: "交互预览" },
+  { selector: "#demo-title", text: "Demo 面板" },
+  {
+    selector: "#demos .section-heading p:not(.eyebrow)",
+    text: "这些是静态预览，不等同于实时模型推理。我用它们展示输入、输出，以及每个项目旁边的小检查。"
+  },
+  { selectorAll: ".demo-tabs button", text: ["Qwen3-VL", "Agent 工作流", "追踪", "安全聊天", "RentConnect", "AI 报告"] },
+  { selector: "#notes .eyebrow", text: "工作方式" },
+  { selector: "#notes-title", text: "几条让项目不那么空泛的工作习惯" },
+  { selectorAll: ".note-stack h3", text: ["我会尽量留下证据。", "我用 AI 工具，但最终结果还是我负责。", "我喜欢把乱的原型先跑起来。"] },
+  {
+    selectorAll: ".note-stack p",
+    text: [
+      "做 AI Demo 时，我会保留输入图、渲染结果、日志、CSV 汇总、计时记录和清楚的启动步骤，这样别人能复查。",
+      "我会用 Codex、Antigravity、Hermes OpenClaw 和 Coze 做脚手架、调试、流程草稿和文档，但会自己检查假设、跑代码、删掉不像我会说的话。",
+      "我最近的工作经常夹在模型、摄像头、API、Linux 设备和 Demo 截止时间之间。我能先做出第一版，再把关键步骤写到别人不用猜。"
+    ]
+  },
+  { selector: "#experience .eyebrow", text: "经历" },
+  { selector: "#experience-title", text: "近期工程工作" },
+  {
+    selectorAll: ".timeline p",
+    text: [
+      "参与 Qwen 系列模型、FastAPI、Gradio、vLLM、RealSense/SAM 追踪、批量检测脚本，以及 Jetson AGX Orin 和 RK3588/RKNN 端侧 AI 测试相关 Demo。工作偏落地：环境、脚本、输出、报告、计时检查和 Demo 维护。",
+      "负责客户需求和服务器环境搭建，包括 ESXi/RAID/Docker/Nginx、反向代理、隧道、BeamNG 与 Minecraft 服务器部署、模组测试、故障排查和交接文档。",
+      "支持 LLM 部署实验、云服务器维护、AI 课程材料、Jupyter labs、考试材料、项目站点维护和文档更新。"
+    ]
+  },
+  { selector: "#contact .eyebrow", text: "联系" },
+  { selector: "#contact-title", text: "正在寻找 AI Developer 和 Software Engineering 方向机会。" },
+  {
+    selector: "#contact p:not(.eyebrow)",
+    text:
+      "更适合我的方向：LLM/VLM 应用工程、Python/FastAPI 服务、机器人 Demo 工具、多模态工作流，以及需要实际交付的全栈原型。"
+  },
+  { selectorAll: ".contact-actions .button", text: ["Email", "GitHub Portfolio", "LinkedIn"] },
+  { selectorAll: ".site-footer span", text: ["Zheng (John) Jiang", "基于 Cloudflare Pages 搭建的静态作品集"] }
+];
+
+const zhMeta = {
+  title: "Zheng (John) Jiang - AI Developer 作品集",
+  description: "Zheng (John) Jiang 的 AI Developer 作品集：LLM/VLM 应用、模型服务接口、机器人感知 Demo 和全栈原型。"
+};
+
+const uiText = {
+  en: {
+    qwenReference: "Reference",
+    qwenSearch: "Search image",
+    qwenRecordedResult: "Recorded result",
+    input: "Input",
+    process: "Process",
+    output: "Output",
+    detections: "detections",
+    recordedRunTime: "recorded run time",
+    bboxOutput: "bbox output",
+    qwenDefaultPrompt:
+      "Based on the two images above. The first image shows a target object. The second image contains multiple target objects. Find all objects of the same type in the second image and return JSON bounding boxes only.",
+    recordedReplayLoaded: "recorded replay loaded",
+    recordedReplayReady: "recorded replay ready",
+    staticReplayReady: "static replay ready",
+    customPreviewCount: "preview",
+    notRun: "not run",
+    textOutput: "Text",
+    draftMode: "draft mode",
+    model: "model",
+    serverResponse: "server response",
+    openedPreviewPanel: "opened preview panel",
+    live: "live",
+    deepSeek: "DeepSeek",
+    projectStatus: (count, query, filter, rawQuery) => {
+      const noun = count === 1 ? "project" : "projects";
+      const filterText = filter === "all" ? "all categories" : filter;
+      return query ? `Showing ${count} ${noun} for "${rawQuery}" in ${filterText}` : `Showing ${count} ${noun}`;
+    },
+    setLiveStatic: "This project is shown as a static replay because the full service depends on local setup.",
+    customPreviewHelp:
+      "Custom images are previewed locally. Click Try live endpoint to send them to the server-side function.",
+    qwenRecordedHelp:
+      "Recorded sample loaded. Click Try live endpoint to call the server-side DashScope function.",
+    qwenCalling: "Calling the Cloudflare Pages Function. The API key stays on the server side.",
+    qwenChecking: "checking endpoint...",
+    deepseekCalling: "Calling the Cloudflare Pages Function. The DeepSeek key stays on the server side.",
+    deepseekLive: "calling DeepSeek endpoint...",
+    localEndpointUnavailable: "endpoint not available on local static preview",
+    localEndpointHelp:
+      "The static local preview cannot reach the Pages Function. Test this on the deployed Cloudflare Pages site.",
+    qwenUnavailableMessage:
+      "Deploy the Cloudflare Pages Function and add a model API key or vLLM endpoint.",
+    deepseekUnavailableMessage:
+      "Deploy the Cloudflare Pages Function and add DEEPSEEK_API_KEY as a Pages secret.",
+    dashscopeConfiguredHelp:
+      "DashScope returned a response. Review the JSON output if no boxes were drawn.",
+    dashscopeCountHelp: (count) =>
+      `DashScope returned ${count} detection result${count === 1 ? "" : "s"}; boxes were drawn on the result image.`,
+    dashscopeMissingHelp: "Add DASHSCOPE_API_KEY as a Cloudflare Pages secret, then redeploy the site.",
+    dashscopeFailedHelp:
+      "Check the DashScope key, model name, base URL region, account quota, and model permissions.",
+    deepseekCompleteHelp: "DeepSeek returned a draft. Treat it as review-first output, not a final decision.",
+    deepseekMissingHelp: "Add DEEPSEEK_API_KEY as a Cloudflare Pages secret, then redeploy the site.",
+    deepseekFailedHelp: "Check the DeepSeek key, model name, base URL, quota, and account permissions.",
+    providerDetailsHelp: "Review the JSON output for provider details and next steps.",
+    responseDetailsHelp: "Review the response details and endpoint status."
+  },
+  zh: {
+    qwenReference: "参考图",
+    qwenSearch: "搜索图",
+    qwenRecordedResult: "回放结果",
+    input: "输入",
+    process: "过程",
+    output: "输出",
+    detections: "检测目标",
+    recordedRunTime: "记录耗时",
+    bboxOutput: "bbox 输出",
+    qwenDefaultPrompt:
+      "请根据上面两张图片完成任务：第一张是目标参考图，第二张包含多个待查找目标。请在第二张图中找出同类目标，只返回 JSON bounding boxes。",
+    recordedReplayLoaded: "已加载回放样例",
+    recordedReplayReady: "回放样例已就绪",
+    staticReplayReady: "静态回放已就绪",
+    customPreviewCount: "预览",
+    notRun: "未运行",
+    textOutput: "文本",
+    draftMode: "草稿模式",
+    model: "模型",
+    serverResponse: "服务端返回",
+    openedPreviewPanel: "已打开预览面板",
+    live: "在线",
+    deepSeek: "DeepSeek",
+    projectStatus: (count, query, filter, rawQuery) => {
+      const filterText =
+        {
+          all: "全部分类",
+          ai: "AI 与视觉",
+          robotics: "机器人",
+          fullstack: "全栈",
+          systems: "系统"
+        }[filter] || filter;
+      return query ? `在 ${filterText} 中找到 ${count} 个与“${rawQuery}”相关的项目` : `显示 ${count} 个项目`;
+    },
+    setLiveStatic: "这个项目以静态回放展示，因为完整服务依赖本地环境。",
+    customPreviewHelp: "自定义图片只会先在本地预览。点击在线接口后，才会发到服务端函数。",
+    qwenRecordedHelp: "回放样例已加载。点击在线接口会调用服务端 DashScope 函数。",
+    qwenCalling: "正在调用 Cloudflare Pages Function，API key 保留在服务端。",
+    qwenChecking: "正在检查接口...",
+    deepseekCalling: "正在调用 Cloudflare Pages Function，DeepSeek key 保留在服务端。",
+    deepseekLive: "正在调用 DeepSeek 接口...",
+    localEndpointUnavailable: "本地静态预览无法访问接口",
+    localEndpointHelp: "本地 file/static 预览访问不到 Pages Function，请到已部署的 Cloudflare Pages 网站测试。",
+    qwenUnavailableMessage: "请部署 Cloudflare Pages Function，并配置模型 API key 或自己的 vLLM endpoint。",
+    deepseekUnavailableMessage: "请部署 Cloudflare Pages Function，并把 DEEPSEEK_API_KEY 配成 Pages secret。",
+    dashscopeConfiguredHelp: "DashScope 已返回结果。如果没有画出框，请检查 JSON 输出。",
+    dashscopeCountHelp: (count) => `DashScope 返回了 ${count} 个检测结果，已尝试画到结果图上。`,
+    dashscopeMissingHelp: "请把 DASHSCOPE_API_KEY 添加为 Cloudflare Pages secret，然后重新部署。",
+    dashscopeFailedHelp: "请检查 DashScope key、模型名、base URL 区域、额度和模型权限。",
+    deepseekCompleteHelp: "DeepSeek 返回了草稿。这里只适合先 review，不要直接当最终结论。",
+    deepseekMissingHelp: "请把 DEEPSEEK_API_KEY 添加为 Cloudflare Pages secret，然后重新部署。",
+    deepseekFailedHelp: "请检查 DeepSeek key、模型名、base URL、额度和账号权限。",
+    providerDetailsHelp: "请查看 JSON 输出里的服务商返回和下一步信息。",
+    responseDetailsHelp: "请查看接口返回内容和状态。"
+  }
+};
+
+function copy() {
+  return uiText[currentLang] || uiText.en;
+}
+
+function storeOriginal(entry) {
+  if (originalStaticValues.has(entry)) return;
+  if (entry.selectorAll) {
+    const nodes = [...document.querySelectorAll(entry.selectorAll)];
+    originalStaticValues.set(
+      entry,
+      nodes.map((node) => ({
+        node,
+        text: node.textContent,
+        html: node.innerHTML,
+        attr: entry.attr ? node.getAttribute(entry.attr) : null
+      }))
+    );
+    return;
+  }
+
+  const node = document.querySelector(entry.selector);
+  if (!node) return;
+  originalStaticValues.set(entry, {
+    node,
+    text: node.textContent,
+    html: node.innerHTML,
+    attr: entry.attr ? node.getAttribute(entry.attr) : null
+  });
+}
+
+function captureOriginalStaticCopy() {
+  zhStaticCopy.forEach(storeOriginal);
+}
+
+function applyEntryValue(node, entry, value) {
+  if (!node || value === undefined) return;
+  if (entry.attr) {
+    node.setAttribute(entry.attr, value);
+  } else if (entry.html) {
+    node.innerHTML = value;
+  } else {
+    node.textContent = value;
+  }
+}
+
+function applyStaticLanguage() {
+  document.documentElement.lang = currentLang === "zh" ? "zh-CN" : "en";
+  const meta = document.querySelector('meta[name="description"]');
+  document.title = currentLang === "zh" ? zhMeta.title : originalDocumentTitle;
+  if (meta) meta.content = currentLang === "zh" ? zhMeta.description : originalMetaDescription;
+
+  zhStaticCopy.forEach((entry) => {
+    const original = originalStaticValues.get(entry);
+    if (!original) return;
+
+    if (Array.isArray(original)) {
+      original.forEach((item, index) => {
+        if (currentLang === "zh") {
+          const values = entry.html || entry.text || [];
+          applyEntryValue(item.node, entry, values[index]);
+        } else if (entry.attr) {
+          item.node.setAttribute(entry.attr, item.attr || "");
+        } else if (entry.html) {
+          item.node.innerHTML = item.html;
+        } else {
+          item.node.textContent = item.text;
+        }
+      });
+      return;
+    }
+
+    if (currentLang === "zh") {
+      applyEntryValue(original.node, entry, entry.value ?? entry.html ?? entry.text);
+    } else if (entry.attr) {
+      original.node.setAttribute(entry.attr, original.attr || "");
+    } else if (entry.html) {
+      original.node.innerHTML = original.html;
+    } else {
+      original.node.textContent = original.text;
+    }
+  });
+
+  document.querySelectorAll("[data-lang]").forEach((button) => {
+    const active = button.dataset.lang === currentLang;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+}
+
+function switchLanguage(lang) {
+  if (!["en", "zh"].includes(lang) || lang === currentLang) return;
+  currentLang = lang;
+  localStorage.setItem(LANG_STORAGE_KEY, currentLang);
+  applyStaticLanguage();
+  setDemo(currentDemoName, false, false);
+  openProjectNote(currentProjectNoteName, false);
+  setLabMode(currentLabMode);
+  applyProjectFilters();
+}
+
 const demos = {
   qwen: {
     title: "Qwen3-VL reference-guided detection",
@@ -114,6 +527,122 @@ docker-compose services: webapp, db, nginx</code></pre>
   }
 };
 
+const demosZh = {
+  qwen: {
+    title: "Qwen3-VL 参考图检测",
+    body: `
+      <div class="demo-layout">
+        <div class="demo-images">
+          <figure><img src="./assets/qwen-ref.jpg" alt="参考目标"><figcaption>参考目标</figcaption></figure>
+          <figure><img src="./assets/qwen-test.jpg" alt="搜索图"><figcaption>搜索图</figcaption></figure>
+          <figure><img src="./assets/qwen-result.jpg" alt="检测结果"><figcaption>渲染结果</figcaption></figure>
+        </div>
+        <pre class="demo-log"><code>{
+  "task": "find objects matching the reference image",
+  "model": "Qwen3-VL-8B-Instruct",
+  "checks": [
+    "pair testN with testN_ref",
+    "parse JSON output",
+    "convert normalized coordinates to pixels",
+    "write JSON, CSV/XLSX, and rendered image"
+  ]
+}</code></pre>
+      </div>
+    `
+  },
+  property: {
+    title: "物业管理 Agent 工作流",
+    body: `
+      <div class="demo-layout">
+        <figure class="demo-capture">
+          <img src="./assets/project-captures/property-staff-dashboard.png" alt="Property Management System staff dashboard screenshot">
+          <figcaption>本地登录测试后的员工后台</figcaption>
+        </figure>
+        <div>
+          <h3>这个 Demo 说明什么</h3>
+          <p>它展示的是完整应用流程：session 登录、owner/staff dashboard、聊天，以及可以被检查的 AI 辅助回复路径，而不是一个黑盒按钮。</p>
+          <div class="metrics">
+            <div><strong>2</strong><span>dashboard</span></div>
+            <div><strong>3</strong><span>测试角色</span></div>
+            <div><strong>API</strong><span>AI 草稿路径</span></div>
+          </div>
+        </div>
+      </div>
+    `
+  },
+  tracking: {
+    title: "RealSense + SAM 3 追踪流程",
+    body: `
+      <div class="demo-layout">
+        <canvas class="tracking-canvas" id="demoTrackingCanvas" width="720" height="360" aria-label="Tracking simulation canvas"></canvas>
+        <div>
+          <h3>结构化感知输出</h3>
+          <p>这个原型不是只显示 mask，而是把彩色/深度输入、mask tracking、bbox、2D/3D anchor、姿态提示和目标状态整理给机器人 Demo 使用。</p>
+          <pre class="demo-log"><code>{
+  "bbox": [244, 96, 418, 231],
+  "anchor_2d": [331, 166],
+  "depth_m": 1.42,
+  "state": "tracked",
+  "pose_hint": "front-left reachable"
+}</code></pre>
+        </div>
+      </div>
+    `
+  },
+  chat: {
+    title: "安全聊天设计",
+    body: `
+      <div class="demo-layout">
+        <div>
+          <video class="demo-video" src="./assets/e2ee-chat-demo.mp4" controls playsinline preload="metadata"></video>
+          <p class="video-caption">E2EE Chat Network Application 的压缩项目演示片段。</p>
+        </div>
+        <pre class="demo-log"><code>client -> TLS -> Flask app -> MySQL
+OTP verified: true
+message status: encrypted payload queued
+docker-compose services: webapp, db, nginx</code></pre>
+      </div>
+    `
+  },
+  rentconnect: {
+    title: "RentConnect SaaS 流程",
+    body: `
+      <div class="demo-layout">
+        <figure class="demo-capture">
+          <img src="./assets/project-captures/rentconnect-home.png" alt="RentConnect running React homepage">
+          <figcaption>React 应用在本地 3001 端口运行</figcaption>
+        </figure>
+        <div>
+          <h3>React 与 Firebase 应用结构</h3>
+          <p>项目包含认证、Firestore 数据、Material UI 组件、Redux 状态和支付接线，围绕一个地产 SaaS 流程搭起来。</p>
+          <div class="metrics">
+            <div><strong>React</strong><span>前端</span></div>
+            <div><strong>Firebase</strong><span>认证/数据</span></div>
+            <div><strong>AES</strong><span>安全概念</span></div>
+          </div>
+        </div>
+      </div>
+    `
+  },
+  finance: {
+    title: "AI 报告工作流",
+    body: `
+      <div class="demo-layout">
+        <figure class="demo-capture">
+          <img src="./assets/project-captures/finance-terminal.png" alt="AI Finance Advisor terminal workflow screenshot">
+          <figcaption>本地报告流程的终端证据</figcaption>
+        </figure>
+        <pre class="demo-log"><code># Report skeleton
+- context summary
+- risk notes
+- action checklist
+- daily/monthly Markdown output
+- manual review before use</code></pre>
+      </div>
+    `
+  }
+};
+
 const projectDetails = {
   qwen: {
     title: "Qwen3-VL DuoImage Detector",
@@ -172,6 +701,69 @@ const projectDetails = {
         <li>This is a local AI workflow experiment, not a product and not financial advice.</li>
         <li>The project stores configuration and history locally, calls an LLM when an API key is configured, and writes Markdown reports.</li>
         <li>Next improvement: separate data loading, model call, and report rendering into testable modules with safer sample data.</li>
+      </ul>
+    `
+  }
+};
+
+const projectDetailsZh = {
+  qwen: {
+    title: "Qwen3-VL 双图检测器",
+    body: `
+      <ul>
+        <li>我希望结果能被复查，所以脚本同时写出机器可读文件和渲染图。</li>
+        <li>真正的工程工作在模型调用外面：图像配对、提示词稳定、JSON 解析和坐标换算。</li>
+        <li>下一步想补一个小评估目录，放 expected boxes 和失败样例。</li>
+      </ul>
+    `
+  },
+  property: {
+    title: "Property Management System",
+    body: `
+      <ul>
+        <li>我本地启动过 Express server，并测试了 owner/staff 登录路径，再把截图放到网站上。</li>
+        <li>项目包含 session dashboard、维修请求、公告、Socket.IO 聊天和 OpenAI-compatible AI 回复路由。</li>
+        <li>下一步会把 mock data 换成小数据库，并给 issue 状态变化加 audit logs。</li>
+      </ul>
+    `
+  },
+  tracking: {
+    title: "RealSense + SAM 3 追踪原型",
+    body: `
+      <ul>
+        <li>目标不是只做分割，而是输出能被下游机器人模块使用的结构化状态。</li>
+        <li>我整理过相机输入、mask 输出、2D/3D anchor、bbox 和姿态提示。</li>
+        <li>下一步会存短视频，并比较不同光照和距离下的追踪稳定性。</li>
+      </ul>
+    `
+  },
+  chat: {
+    title: "E2EE Chat Network Application",
+    body: `
+      <ul>
+        <li>项目用 Docker Compose 管理 Nginx、Flask、MySQL、TLS 证书、init SQL 和 OTP 相关资产。</li>
+        <li>我把视频 Demo 放到网站上，是因为这个项目依赖本地证书和 hosts 配置，不适合只做静态截图。</li>
+        <li>下一步会补一份 threat model 和一条 one-command health check。</li>
+      </ul>
+    `
+  },
+  rentconnect: {
+    title: "RentConnect Secure SaaS Platform",
+    body: `
+      <ul>
+        <li>我用 legacy peer 方式装回 React 依赖，并补了缺失图片资源，让项目能编译截图。</li>
+        <li>这个项目的价值在结构：React routes、Firebase config、Material UI、listing/search UI 和支付接线。</li>
+        <li>下一步会处理旧 CRA 依赖和 ESLint warnings，再把它当成更接近生产的版本。</li>
+      </ul>
+    `
+  },
+  finance: {
+    title: "AI Finance Advisor",
+    body: `
+      <ul>
+        <li>这是本地 AI 工作流实验，不是产品，也不是财务建议。</li>
+        <li>项目会读取本地配置和历史记录，在配置 API key 后调用 LLM，并写出 Markdown 报告。</li>
+        <li>下一步会把数据加载、模型调用和报告渲染拆成可测试模块，并换成更安全的 sample data。</li>
       </ul>
     `
   }
@@ -448,6 +1040,160 @@ const labModes = {
   }
 };
 
+const labModeZh = {
+  qwen: {
+    intro: "参考图引导检测：可以看记录样例，也可以调用在线 Qwen3-VL 接口。",
+    sampleLabel: "记录样例",
+    promptLabel: "提示词",
+    primaryText: "运行回放",
+    secondaryText: "调用在线接口",
+    help: "点击在线接口会调用服务端 Qwen/VLM 函数。",
+    options: {
+      test1: { label: "鼠标目标，3 个检测结果" },
+      test2: { label: "立牌目标，4 个检测结果" }
+    }
+  },
+  property: {
+    intro: "把物业请求整理成短的员工侧处理草稿。",
+    sampleLabel: "工作流样例",
+    promptLabel: "租客 / 员工上下文",
+    primaryText: "运行工作流回放",
+    secondaryText: "调用 DeepSeek 接口",
+    help: "DeepSeek 可以通过服务端 Pages Function 生成 triage 草稿。",
+    options: {
+      leak_triage: {
+        label: "漏水请求分流",
+        prompt:
+          "租客说晚上 10 点后浴室天花板漏水。owner dashboard 需要一条简短优先级说明、员工回复和下一步动作。请保持简洁，可执行。",
+        captions: ["登录/session 流程", "员工后台", "业主后台"],
+        metrics: ["3", "涉及角色", "AI", "处理草稿", "JSON", "交接说明"],
+        replay: {
+          priority: "urgent",
+          issue_type: "water leak",
+          staff_reply: "已按 urgent 记录，因为可能有持续水损。请上传照片，并确认现在是否还在漏水。",
+          next_actions: ["open repair request", "notify owner", "assign maintenance", "track follow-up"]
+        }
+      },
+      notice_summary: {
+        label: "住户通知摘要",
+        prompt:
+          "给住户写一条物业通知：周五 9am-1pm 电梯维护，服务团队在现场，楼层通行可能延迟。语气清楚、礼貌。",
+        captions: ["业主视图", "员工视图", "服务端输出"],
+        metrics: ["2", "dashboard", "Notice", "摘要", "Review", "发送前检查"],
+        replay: {
+          notice: "电梯将在周五 9:00am 到 1:00pm 维护。服务团队会在现场，期间楼层通行可能会有延迟。",
+          tone: "clear, polite, operational",
+          review_required: true
+        }
+      }
+    }
+  },
+  finance: {
+    intro: "根据小样例档案生成一份先 review 的财务报告草稿。",
+    sampleLabel: "报告样例",
+    promptLabel: "档案 / 报告需求",
+    primaryText: "运行报告回放",
+    secondaryText: "调用 DeepSeek 接口",
+    help: "这个 Demo 只用于草稿生成，不是财务建议。",
+    options: {
+      cashflow_review: {
+        label: "现金流检查草稿",
+        prompt:
+          "给一名刚毕业的新人写一份谨慎的财务报告草稿，内容包括房租、手机费、餐饮、交通和应急储蓄。不要给投资建议，不要编造金额，用 placeholder 和待确认问题。",
+        captions: ["本地流程", "报告脚本", "终端证据"],
+        metrics: ["Draft", "先 review", "0", "建议承诺", "MD", "报告输出"],
+        replay: {
+          scope: "budget and cashflow draft",
+          not_financial_advice: true,
+          sections: ["context summary", "monthly cost checklist", "risk notes", "questions to verify"],
+          next_step: "使用报告前手动检查数字"
+        }
+      },
+      job_budget: {
+        label: "搬到多伦多预算草稿",
+        prompt:
+          "写一份搬到多伦多入职第一份软件工作的预算 checklist，包括房租押金、手机、交通、餐饮、电脑/云服务成本和应急 buffer。不要给投资建议，不要编金额。",
+        captions: ["财务流程", "住房上下文", "租房 UI 上下文"],
+        metrics: ["Budget", "checklist", "Toronto", "relocation", "Manual", "review"],
+        replay: {
+          checklist: ["first month rent", "deposit", "phone plan", "transit", "food", "cloud/tool costs"],
+          buffer_note: "新增固定支出前，先留出单独 emergency buffer",
+          review_required: true
+        }
+      }
+    }
+  },
+  tracking: {
+    intro: "回放结构化感知状态，而不是只展示屏幕上的 mask。",
+    sampleLabel: "追踪样例",
+    promptLabel: "目标状态请求",
+    primaryText: "运行状态回放",
+    secondaryText: "打开预览面板",
+    help: "静态网站没有连接相机，这里展示的是 tracking state 的数据形状。",
+    options: {
+      mask_state: {
+        label: "Mask + bbox + anchor 状态",
+        prompt:
+          "给定彩色/深度输入和 SAM mask，输出 bbox、2D anchor、深度估计、状态和一个简单姿态提示，供机器人 Demo 使用。",
+        captions: ["帧 t0", "帧 t1", "追踪状态"],
+        metrics: ["1", "追踪目标", "1.42m", "深度提示", "JSON", "状态"],
+        replay: {
+          bbox: [244, 96, 418, 231],
+          anchor_2d: [331, 166],
+          depth_m: 1.42,
+          state: "tracked",
+          pose_hint: "front-left reachable"
+        }
+      }
+    }
+  },
+  chat: {
+    intro: "展示安全聊天服务结构：TLS、Flask、MySQL、OTP 和加密 payload 处理。",
+    sampleLabel: "安全样例",
+    promptLabel: "待检查流程",
+    primaryText: "运行流程回放",
+    secondaryText: "打开预览面板",
+    help: "完整项目依赖本地证书和 Docker Compose，所以网站展示已检查过的流程。",
+    options: {
+      message_flow: {
+        label: "加密消息流程",
+        prompt:
+          "追踪一条安全消息：client login、OTP verification、TLS/Nginx、Flask、MySQL 和 encrypted payload handling。",
+        captions: ["Docker stack", "TLS/Nginx 路径", "服务证据"],
+        metrics: ["4", "服务", "OTP", "登录检查", "TLS", "传输"],
+        replay: {
+          services: ["nginx", "flask webapp", "mysql", "otp setup"],
+          message_status: "encrypted payload queued",
+          deployment_note: "需要本地 hosts/certificate 配置后才能完整运行"
+        }
+      }
+    }
+  },
+  rentconnect: {
+    intro: "回放租房 SaaS 原型背后的 Web App 结构。",
+    sampleLabel: "SaaS 样例",
+    promptLabel: "功能路径",
+    primaryText: "运行 UI 回放",
+    secondaryText: "打开预览面板",
+    help: "这里展示 React/Firebase 应用结构和本地截图的静态回放。",
+    options: {
+      listing_flow: {
+        label: "房源与账号流程",
+        prompt:
+          "展示 RentConnect 原型如何连接 React routes、Firebase Auth、Firestore 数据、listing search、Material UI 和 payment wiring。",
+        captions: ["首页", "功能区", "本地终端"],
+        metrics: ["React", "前端", "Firebase", "认证/数据", "Adyen", "接线"],
+        replay: {
+          frontend: "React + Material UI",
+          data: "Firebase Auth / Firestore config shape",
+          payment: "Adyen client-key wiring only; real payments need backend session flow",
+          next_step: "更新依赖，并收紧 Firebase security rules"
+        }
+      }
+    }
+  }
+};
+
 const demoOutput = document.getElementById("demoOutput");
 const demoButtons = document.querySelectorAll("[data-demo]");
 const labModeButtons = document.querySelectorAll("[data-lab-mode]");
@@ -487,20 +1233,48 @@ const tryLiveButton = document.getElementById("tryLiveInference");
 let currentLabMode = "qwen";
 let activeProjectFilter = "all";
 
+function getDemoCopy(name) {
+  if (currentLang === "zh") return demosZh[name] || demosZh.qwen || demos[name] || demos.qwen;
+  return demos[name] || demos.qwen;
+}
+
+function getProjectDetailCopy(name) {
+  if (currentLang === "zh") return projectDetailsZh[name] || projectDetailsZh.qwen || projectDetails[name] || projectDetails.qwen;
+  return projectDetails[name] || projectDetails.qwen;
+}
+
+function getLabModeCopy(name) {
+  const base = labModes[name] || labModes.qwen;
+  if (currentLang !== "zh") return base;
+
+  const override = labModeZh[name] || {};
+  const localizedOptions = base.options.map((option) => ({
+    ...option,
+    ...(override.options?.[option.value] || {})
+  }));
+
+  return {
+    ...base,
+    ...override,
+    options: localizedOptions
+  };
+}
+
 function setDemo(name, shouldScroll = true, shouldUpdateHash = true) {
-  const demo = demos[name] || demos.qwen;
+  currentDemoName = demos[name] ? name : "qwen";
+  const demo = getDemoCopy(currentDemoName);
   demoOutput.innerHTML = `<h3>${demo.title}</h3>${demo.body}`;
   demoButtons.forEach((button) => {
-    button.classList.toggle("active", button.dataset.demo === name && button.closest(".demo-tabs"));
+    button.classList.toggle("active", button.dataset.demo === currentDemoName && button.closest(".demo-tabs"));
   });
 
-  if (name === "tracking") {
+  if (currentDemoName === "tracking") {
     const canvas = document.getElementById("demoTrackingCanvas");
     if (canvas) drawTracking(canvas, performance.now() / 1000);
   }
 
   if (shouldUpdateHash) {
-    history.replaceState(null, "", `#demo-${name}`);
+    history.replaceState(null, "", `#demo-${currentDemoName}`);
   }
 
   if (shouldScroll) {
@@ -509,10 +1283,11 @@ function setDemo(name, shouldScroll = true, shouldUpdateHash = true) {
 }
 
 function openProjectNote(name, shouldScroll = true) {
-  const detail = projectDetails[name] || projectDetails.qwen;
+  currentProjectNoteName = projectDetails[name] ? name : "qwen";
+  const detail = getProjectDetailCopy(currentProjectNoteName);
   projectDetailTitle.textContent = detail.title;
   projectDetailBody.innerHTML = detail.body;
-  history.replaceState(null, "", `#note-${name}`);
+  history.replaceState(null, "", `#note-${currentProjectNoteName}`);
 
   if (shouldScroll) {
     document.getElementById("projectDetail").scrollIntoView({ behavior: "smooth", block: "center" });
@@ -559,11 +1334,12 @@ function normalizeSearch(value) {
 
 function updateProjectSearchStatus(count, query) {
   if (projectSearchStatus) {
-    const noun = count === 1 ? "project" : "projects";
-    const filterText = activeProjectFilter === "all" ? "all categories" : activeProjectFilter;
-    projectSearchStatus.textContent = query
-      ? `Showing ${count} ${noun} for "${projectSearchInput.value.trim()}" in ${filterText}`
-      : `Showing ${count} ${noun}`;
+    projectSearchStatus.textContent = copy().projectStatus(
+      count,
+      query,
+      activeProjectFilter,
+      projectSearchInput.value.trim()
+    );
   }
 
   if (projectEmpty) {
@@ -589,8 +1365,9 @@ function populateLabOptions(mode) {
 }
 
 function setLabMode(name) {
-  const mode = labModes[name] || labModes.qwen;
+  const mode = getLabModeCopy(name);
   currentLabMode = labModes[name] ? name : "qwen";
+  const previousSample = sampleSelect?.value;
 
   labModeButtons.forEach((button) => {
     button.classList.toggle("active", button.dataset.labMode === currentLabMode);
@@ -607,6 +1384,9 @@ function setLabMode(name) {
   });
 
   populateLabOptions(mode);
+  if (previousSample && mode.options.some((option) => option.value === previousSample)) {
+    sampleSelect.value = previousSample;
+  }
 
   if (mode.type === "qwen") {
     setLabSample(sampleSelect?.value || "test1");
@@ -620,26 +1400,25 @@ function setLabSample(name) {
   labRefImage.src = sample.ref;
   labSearchImage.src = sample.search;
   labResultImage.src = sample.result;
-  if (labRefCaption) labRefCaption.textContent = "Reference";
-  if (labSearchCaption) labSearchCaption.textContent = "Search image";
-  if (labResultCaption) labResultCaption.textContent = "Recorded result";
+  if (labRefCaption) labRefCaption.textContent = copy().qwenReference;
+  if (labSearchCaption) labSearchCaption.textContent = copy().qwenSearch;
+  if (labResultCaption) labResultCaption.textContent = copy().qwenRecordedResult;
   labDetectionCount.textContent = sample.count;
   labAvgTime.textContent = sample.avgTime;
   if (labOutputKind) labOutputKind.textContent = "JSON";
-  if (labMetricOneLabel) labMetricOneLabel.textContent = "detections";
-  if (labMetricTwoLabel) labMetricTwoLabel.textContent = "recorded run time";
-  if (labMetricThreeLabel) labMetricThreeLabel.textContent = "bbox output";
+  if (labMetricOneLabel) labMetricOneLabel.textContent = copy().detections;
+  if (labMetricTwoLabel) labMetricTwoLabel.textContent = copy().recordedRunTime;
+  if (labMetricThreeLabel) labMetricThreeLabel.textContent = copy().bboxOutput;
   if (labPrompt) {
-    labPrompt.value =
-      "Based on the two images above. The first image shows a target object. The second image contains multiple target objects. Find all objects of the same type in the second image and return JSON bounding boxes only.";
+    labPrompt.value = copy().qwenDefaultPrompt;
   }
   labJsonOutput.textContent = JSON.stringify(sample.json, null, 2);
-  liveStatus.textContent = "recorded replay loaded";
-  setLiveHelp("Recorded sample loaded. Click Try live endpoint to call the server-side DashScope function.");
+  liveStatus.textContent = copy().recordedReplayLoaded;
+  setLiveHelp(copy().qwenRecordedHelp);
 }
 
 function setProjectLabSample(value) {
-  const mode = labModes[currentLabMode] || labModes.property;
+  const mode = getLabModeCopy(currentLabMode);
   const sample = mode.options.find((item) => item.value === value) || mode.options[0];
 
   if (labPrompt) labPrompt.value = sample.prompt;
@@ -647,7 +1426,7 @@ function setProjectLabSample(value) {
   setLabMetrics(sample.metrics);
   labJsonOutput.textContent =
     typeof sample.replay === "string" ? sample.replay : JSON.stringify(sample.replay, null, 2);
-  liveStatus.textContent = mode.type === "deepseek" ? "recorded replay ready" : "static replay ready";
+  liveStatus.textContent = mode.type === "deepseek" ? copy().recordedReplayReady : copy().staticReplayReady;
   setLiveHelp(mode.help);
 }
 
@@ -658,9 +1437,9 @@ function setLabImages(images, captions = []) {
   if (labRefImage) labRefImage.src = ref;
   if (labSearchImage) labSearchImage.src = search;
   if (labResultImage) labResultImage.src = result;
-  if (labRefCaption) labRefCaption.textContent = captions[0] || "Input";
-  if (labSearchCaption) labSearchCaption.textContent = captions[1] || "Process";
-  if (labResultCaption) labResultCaption.textContent = captions[2] || "Output";
+  if (labRefCaption) labRefCaption.textContent = captions[0] || copy().input;
+  if (labSearchCaption) labSearchCaption.textContent = captions[1] || copy().process;
+  if (labResultCaption) labResultCaption.textContent = captions[2] || copy().output;
 }
 
 function resolveLabImage(value) {
@@ -684,7 +1463,8 @@ function previewUpload(input, targetImage, fallbackResult = false) {
   targetImage.src = url;
   if (fallbackResult) labResultImage.src = url;
   labDetectionCount.textContent = "preview";
-  labAvgTime.textContent = "not run";
+  labDetectionCount.textContent = copy().customPreviewCount;
+  labAvgTime.textContent = copy().notRun;
   labJsonOutput.textContent = JSON.stringify(
     {
       status: "custom image preview only",
@@ -693,8 +1473,9 @@ function previewUpload(input, targetImage, fallbackResult = false) {
     null,
     2
   );
-  liveStatus.textContent = "custom images loaded; inference not run";
-  setLiveHelp("Custom images are previewed locally. Click Try live endpoint to send them to the server-side function.");
+  liveStatus.textContent =
+    currentLang === "zh" ? "已加载自定义图片；尚未推理" : "custom images loaded; inference not run";
+  setLiveHelp(copy().customPreviewHelp);
 }
 
 labModeButtons.forEach((button) => {
@@ -715,14 +1496,14 @@ runRecordedButton?.addEventListener("click", () => {
     return;
   }
 
-  setProjectLabSample(sampleSelect?.value || labModes[currentLabMode].options[0].value);
+  setProjectLabSample(sampleSelect?.value || getLabModeCopy(currentLabMode).options[0].value);
 });
 
 refUpload?.addEventListener("change", () => previewUpload(refUpload, labRefImage));
 searchUpload?.addEventListener("change", () => previewUpload(searchUpload, labSearchImage, true));
 
 tryLiveButton?.addEventListener("click", async () => {
-  const mode = labModes[currentLabMode] || labModes.qwen;
+  const mode = getLabModeCopy(currentLabMode);
   if (mode.type === "deepseek") {
     await runDeepSeekLiveDemo(mode);
     return;
@@ -730,8 +1511,8 @@ tryLiveButton?.addEventListener("click", async () => {
 
   if (mode.type === "static") {
     setDemo(mode.linkedDemo || currentLabMode);
-    liveStatus.textContent = "opened preview panel";
-    setLiveHelp("This project is shown as a static replay because the full service depends on local setup.");
+    liveStatus.textContent = copy().openedPreviewPanel;
+    setLiveHelp(copy().setLiveStatic);
     return;
   }
 
@@ -739,8 +1520,8 @@ tryLiveButton?.addEventListener("click", async () => {
 });
 
 async function runQwenLiveInference() {
-  liveStatus.textContent = "checking endpoint...";
-  setLiveHelp("Calling the Cloudflare Pages Function. The API key stays on the server side.");
+  liveStatus.textContent = copy().qwenChecking;
+  setLiveHelp(copy().qwenCalling);
   const formData = new FormData();
   formData.append("sample", sampleSelect?.value || "test1");
   formData.append("prompt", labPrompt?.value || "");
@@ -757,12 +1538,12 @@ async function runQwenLiveInference() {
     renderLivePayload(payload, response.ok);
     updateLiveHelp(payload, response.ok);
   } catch (error) {
-    liveStatus.textContent = "endpoint not available on local static preview";
-    setLiveHelp("The static local preview cannot reach the Pages Function. Test this on the deployed Cloudflare Pages site.");
+    liveStatus.textContent = copy().localEndpointUnavailable;
+    setLiveHelp(copy().localEndpointHelp);
     labJsonOutput.textContent = JSON.stringify(
       {
         status: "live endpoint unavailable",
-        message: "Deploy the Cloudflare Pages Function and add a model API key or vLLM endpoint.",
+        message: copy().qwenUnavailableMessage,
         error: error.message
       },
       null,
@@ -772,8 +1553,8 @@ async function runQwenLiveInference() {
 }
 
 async function runDeepSeekLiveDemo(mode) {
-  liveStatus.textContent = "calling DeepSeek endpoint...";
-  setLiveHelp("Calling the Cloudflare Pages Function. The DeepSeek key stays on the server side.");
+  liveStatus.textContent = copy().deepseekLive;
+  setLiveHelp(copy().deepseekCalling);
 
   try {
     const response = await fetch("/api/deepseek-demo", {
@@ -799,12 +1580,12 @@ async function runDeepSeekLiveDemo(mode) {
     renderDeepSeekPayload(payload, response.ok);
     updateDeepSeekHelp(payload, response.ok);
   } catch (error) {
-    liveStatus.textContent = "endpoint not available on local static preview";
-    setLiveHelp("The static local preview cannot reach the Pages Function. Test this on the deployed Cloudflare Pages site.");
+    liveStatus.textContent = copy().localEndpointUnavailable;
+    setLiveHelp(copy().localEndpointHelp);
     labJsonOutput.textContent = JSON.stringify(
       {
         status: "deepseek endpoint unavailable",
-        message: "Deploy the Cloudflare Pages Function and add DEEPSEEK_API_KEY as a Pages secret.",
+        message: copy().deepseekUnavailableMessage,
         error: error.message
       },
       null,
@@ -827,12 +1608,12 @@ function renderLivePayload(payload, isOk) {
 
 function renderDeepSeekPayload(payload, isOk) {
   if (isOk && payload?.content) {
-    labDetectionCount.textContent = "live";
-    labAvgTime.textContent = payload.model || "DeepSeek";
-    if (labOutputKind) labOutputKind.textContent = "Text";
-    if (labMetricOneLabel) labMetricOneLabel.textContent = "draft mode";
-    if (labMetricTwoLabel) labMetricTwoLabel.textContent = "model";
-    if (labMetricThreeLabel) labMetricThreeLabel.textContent = "server response";
+    labDetectionCount.textContent = copy().live;
+    labAvgTime.textContent = payload.model || copy().deepSeek;
+    if (labOutputKind) labOutputKind.textContent = copy().textOutput;
+    if (labMetricOneLabel) labMetricOneLabel.textContent = copy().draftMode;
+    if (labMetricTwoLabel) labMetricTwoLabel.textContent = copy().model;
+    if (labMetricThreeLabel) labMetricThreeLabel.textContent = copy().serverResponse;
     labJsonOutput.textContent = payload.content;
     return;
   }
@@ -845,42 +1626,42 @@ function updateLiveHelp(payload, isOk) {
     const count = payload?.parsed?.results?.length;
     setLiveHelp(
       count
-        ? `DashScope returned ${count} detection result${count === 1 ? "" : "s"}; boxes were drawn on the result image.`
-        : "DashScope returned a response. Review the JSON output if no boxes were drawn."
+        ? copy().dashscopeCountHelp(count)
+        : copy().dashscopeConfiguredHelp
     );
     return;
   }
 
   if (payload?.status === "live inference not configured") {
-    setLiveHelp("Add DASHSCOPE_API_KEY as a Cloudflare Pages secret, then redeploy the site.");
+    setLiveHelp(copy().dashscopeMissingHelp);
     return;
   }
 
   if (payload?.status === "dashscope request failed") {
-    setLiveHelp("Check the DashScope key, model name, base URL region, account quota, and model permissions.");
+    setLiveHelp(copy().dashscopeFailedHelp);
     return;
   }
 
-  setLiveHelp("Review the JSON output for provider details and next steps.");
+  setLiveHelp(copy().providerDetailsHelp);
 }
 
 function updateDeepSeekHelp(payload, isOk) {
   if (isOk && payload?.status === "deepseek draft complete") {
-    setLiveHelp("DeepSeek returned a draft. Treat it as review-first output, not a final decision.");
+    setLiveHelp(copy().deepseekCompleteHelp);
     return;
   }
 
   if (payload?.status === "deepseek endpoint not configured") {
-    setLiveHelp("Add DEEPSEEK_API_KEY as a Cloudflare Pages secret, then redeploy the site.");
+    setLiveHelp(copy().deepseekMissingHelp);
     return;
   }
 
   if (payload?.status === "deepseek request failed") {
-    setLiveHelp("Check the DeepSeek key, model name, base URL, quota, and account permissions.");
+    setLiveHelp(copy().deepseekFailedHelp);
     return;
   }
 
-  setLiveHelp("Review the response details and endpoint status.");
+  setLiveHelp(copy().responseDetailsHelp);
 }
 
 function setLiveHelp(message) {
@@ -1030,14 +1811,14 @@ function initFromHash() {
   const demoMatch = hash.match(/^demo-(.+)$/);
   const noteMatch = hash.match(/^note-(.+)$/);
 
-  if (demoMatch && demos[demoMatch[1]]) {
-    setDemo(demoMatch[1], false, false);
-    return;
-  }
-
-  setDemo("qwen", false, false);
   setProjectFilter("all");
   setLabMode("qwen");
+
+  if (demoMatch && demos[demoMatch[1]]) {
+    setDemo(demoMatch[1], false, false);
+  } else {
+    setDemo("qwen", false, false);
+  }
 
   if (noteMatch && projectDetails[noteMatch[1]]) {
     openProjectNote(noteMatch[1], false);
@@ -1046,5 +1827,11 @@ function initFromHash() {
   }
 }
 
+document.querySelectorAll("[data-lang]").forEach((button) => {
+  button.addEventListener("click", () => switchLanguage(button.dataset.lang));
+});
+
+captureOriginalStaticCopy();
+applyStaticLanguage();
 drawTracking(document.getElementById("trackingCanvas"), 0.4);
 initFromHash();
