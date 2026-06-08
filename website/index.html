@@ -199,8 +199,8 @@
           <h2 id="lab-title">Replay a real Qwen3-VL run, then try your own prompt and images.</h2>
           <p>
             The recorded samples below use real files from my Qwen3-VL DuoImage Detector project.
-            Uploading new images works for preview now. True live inference needs a model API key
-            or a deployed OpenAI-compatible Qwen/VLM endpoint.
+            Live inference runs through a server-side Cloudflare Pages Function backed by DashScope,
+            so the model key is kept out of browser JavaScript.
           </p>
         </div>
 
@@ -232,8 +232,8 @@
               <button class="button secondary" id="tryLiveInference" type="button">Try live endpoint</button>
             </div>
             <p class="lab-note">
-              Live endpoint status: <strong id="liveStatus">not configured yet</strong>. To enable it,
-              configure a Cloudflare Pages Function with a Qwen/VLM API key or your own vLLM endpoint.
+              Live endpoint status: <strong id="liveStatus">recorded replay ready</strong>.
+              <span id="liveHelpText">Click Try live endpoint to call the server-side Qwen/VLM function.</span>
             </p>
           </div>
 

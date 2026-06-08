@@ -254,6 +254,7 @@ const labJsonOutput = document.getElementById("labJsonOutput");
 const labDetectionCount = document.getElementById("labDetectionCount");
 const labAvgTime = document.getElementById("labAvgTime");
 const liveStatus = document.getElementById("liveStatus");
+const liveHelpText = document.getElementById("liveHelpText");
 
 function setDemo(name, shouldScroll = true, shouldUpdateHash = true) {
   const demo = demos[name] || demos.qwen;
@@ -320,6 +321,7 @@ function setLabSample(name) {
   labAvgTime.textContent = sample.avgTime;
   labJsonOutput.textContent = JSON.stringify(sample.json, null, 2);
   liveStatus.textContent = "recorded replay loaded";
+  setLiveHelp("Recorded sample loaded. Click Try live endpoint to call the server-side DashScope function.");
 }
 
 function previewUpload(input, targetImage, fallbackResult = false) {
@@ -339,6 +341,7 @@ function previewUpload(input, targetImage, fallbackResult = false) {
     2
   );
   liveStatus.textContent = "custom images loaded; inference not run";
+  setLiveHelp("Custom images are previewed locally. Click Try live endpoint to send them to the server-side function.");
 }
 
 sampleSelect?.addEventListener("change", () => setLabSample(sampleSelect.value));
@@ -352,6 +355,7 @@ searchUpload?.addEventListener("change", () => previewUpload(searchUpload, labSe
 
 document.getElementById("tryLiveInference")?.addEventListener("click", async () => {
   liveStatus.textContent = "checking endpoint...";
+  setLiveHelp("Calling the Cloudflare Pages Function. The API key stays on the server side.");
   const formData = new FormData();
   formData.append("sample", sampleSelect?.value || "test1");
   formData.append("prompt", labPrompt?.value || "");
@@ -366,8 +370,10 @@ document.getElementById("tryLiveInference")?.addEventListener("click", async () 
     const payload = await response.json();
     liveStatus.textContent = payload.status || "endpoint returned a response";
     renderLivePayload(payload, response.ok);
+    updateLiveHelp(payload, response.ok);
   } catch (error) {
     liveStatus.textContent = "endpoint not available on local static preview";
+    setLiveHelp("The static local preview cannot reach the Pages Function. Test this on the deployed Cloudflare Pages site.");
     labJsonOutput.textContent = JSON.stringify(
       {
         status: "live endpoint unavailable",
@@ -390,6 +396,34 @@ function renderLivePayload(payload, isOk) {
   }
 
   labJsonOutput.textContent = JSON.stringify(payload.parsed || payload, null, 2);
+}
+
+function updateLiveHelp(payload, isOk) {
+  if (isOk && payload?.status === "live inference complete") {
+    const count = payload?.parsed?.results?.length;
+    setLiveHelp(
+      count
+        ? `DashScope returned ${count} detection result${count === 1 ? "" : "s"}; boxes were drawn on the result image.`
+        : "DashScope returned a response. Review the JSON output if no boxes were drawn."
+    );
+    return;
+  }
+
+  if (payload?.status === "live inference not configured") {
+    setLiveHelp("Add DASHSCOPE_API_KEY as a Cloudflare Pages secret, then redeploy the site.");
+    return;
+  }
+
+  if (payload?.status === "dashscope request failed") {
+    setLiveHelp("Check the DashScope key, model name, base URL region, account quota, and model permissions.");
+    return;
+  }
+
+  setLiveHelp("Review the JSON output for provider details and next steps.");
+}
+
+function setLiveHelp(message) {
+  if (liveHelpText) liveHelpText.textContent = message;
 }
 
 function drawLiveDetections(results) {
